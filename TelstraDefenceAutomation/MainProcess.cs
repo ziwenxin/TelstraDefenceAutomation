@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -14,14 +16,15 @@ namespace TelstraDefenceAutomation
     {
         static void Main(string[] args)
         {
-            ReadData();
+            ISheet sheet = ReadData();
 
-            TollLoginPage tw = new TollLoginPage();
-            tw.Login();
-            tw.DownloadGoodsDocument();
+            TollLoginPage tlp = new TollLoginPage(sheet);
+            TollReportPage trp= tlp.Login();
+
+            trp.DownloadGoodsDocument();
         }
 
-        private static void ReadData()
+        private static ISheet ReadData()
         {
             //get toll data
             try
@@ -29,7 +32,8 @@ namespace TelstraDefenceAutomation
                 using (FileStream fs = new FileStream("TollData.xlsx", FileMode.Open, FileAccess.Read))
                 {
                     XSSFWorkbook hssfWb = new XSSFWorkbook(fs);
-                    sheet = hssfWb.GetSheet("Sheet1");
+                    ISheet sheet = hssfWb.GetSheet("Sheet1");
+                    return sheet;
                 }
             }
             catch (Exception e)
@@ -38,6 +42,7 @@ namespace TelstraDefenceAutomation
                 Console.WriteLine("Failed to read the data from the data file");
                 Environment.Exit(0);
             }
+            return null;
         }
     }
 }

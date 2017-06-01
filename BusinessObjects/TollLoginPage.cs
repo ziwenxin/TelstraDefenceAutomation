@@ -25,15 +25,17 @@ namespace BusinessObjects
         [FindsBy(How = How.Id, Using = "Password")]
         public IWebElement PasswordField { get; set; }
 
-        [FindsBy(How = How.TagName, Using = "button")]
+        //[FindsBy(How = How.TagName, Using = "button")]
+
+        [FindsBy(How = How.XPath, Using = "//button[text()='Login']")]
         public IWebElement LoginBtn { get; set; }
 
 
-        public TollLoginPage()
+        public TollLoginPage(ISheet sheet)
         {
-            IWebDriver driver = WebDriver.ChromeDriver;
-            PageFactory.InitElements(driver, this);
-
+            //inital
+            this.sheet = sheet;
+            PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
 
@@ -41,7 +43,7 @@ namespace BusinessObjects
         }
 
         
-        public void Login()
+        public TollReportPage Login()
         {
             try
             {
@@ -54,6 +56,7 @@ namespace BusinessObjects
                 PasswordField.SendKeys(sheet.GetRow(1).GetCell(2).StringCellValue);
                 //click login
                 LoginBtn.Click();
+                return new TollReportPage(sheet);
             }
             catch (Exception e)
             {
@@ -61,22 +64,8 @@ namespace BusinessObjects
                 Environment.Exit(0);
 
             }
+            return null;
         }
 
-        public TollReportPage GoToReportPage()
-        {
-            IWebDriver driver = WebDriver.ChromeDriver;
-
-            //launch the web
-            driver.Navigate().GoToUrl(sheet.GetRow(1).GetCell(3).StringCellValue);
-            return new TollReportPage();
-        }
-
-        public void DownloadGoodsDocument()
-        {
-            GoToReportPage();
-            GoodReportLink.Click();
-
-        }
     }
 }
