@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelstraDefenceAutomation", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessObjects", "BusinessObjects\BusinessObjects.csproj", "{C6239A40-5E75-446A-B255-E8F42B455B44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyCollection", "PropertyCollection\PropertyCollection.csproj", "{7B49ABEA-FAC1-444E-BA47-A3550F29D763}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C6239A40-5E75-446A-B255-E8F42B455B44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6239A40-5E75-446A-B255-E8F42B455B44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6239A40-5E75-446A-B255-E8F42B455B44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B49ABEA-FAC1-444E-BA47-A3550F29D763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B49ABEA-FAC1-444E-BA47-A3550F29D763}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B49ABEA-FAC1-444E-BA47-A3550F29D763}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B49ABEA-FAC1-444E-BA47-A3550F29D763}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

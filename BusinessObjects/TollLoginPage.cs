@@ -4,19 +4,20 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.PageObjects;
+using PropertyCollection;
 
 namespace BusinessObjects
 {
-    public class TollWeb
+    public class TollLoginPage
     {
-        //driver for chrome
-        private IWebDriver driver;
         //store data from json
-        private JObject Jobj;
+        private ISheet sheet;
 
         [FindsBy(How = How.Id,Using = "UserName")]
         public IWebElement UserNameField { get; set; }
@@ -27,14 +28,16 @@ namespace BusinessObjects
         [FindsBy(How = How.TagName, Using = "button")]
         public IWebElement LoginBtn { get; set; }
 
-        public TollWeb()
-        {
-            driver = new ChromeDriver();
-            PageFactory.InitElements(driver,this);
-            //get json data
-            string JSONStr = File.ReadAllText("TollData.json");
-            Jobj = JObject.Parse(JSONStr);
 
+        public TollLoginPage()
+        {
+            IWebDriver driver = WebDriver.ChromeDriver;
+            PageFactory.InitElements(driver, this);
+
+
+
+
+        
         }
 
         
@@ -42,25 +45,38 @@ namespace BusinessObjects
         {
             try
             {
+                IWebDriver driver = WebDriver.ChromeDriver;
+
                 //launch the web
-                driver.Navigate().GoToUrl(Jobj["TollURL"].ToString());
+                driver.Navigate().GoToUrl(sheet.GetRow(1).GetCell(0).StringCellValue );
                 //enter the credentials
-                UserNameField.SendKeys(Jobj["UserName"].ToString());
-                PasswordField.SendKeys(Jobj["Password"].ToString());
+                UserNameField.SendKeys(sheet.GetRow(1).GetCell(1).StringCellValue);
+                PasswordField.SendKeys(sheet.GetRow(1).GetCell(2).StringCellValue);
                 //click login
                 LoginBtn.Click();
             }
             catch (Exception e)
             {
                 Console.WriteLine("Failed to login");
-                
+                Environment.Exit(0);
+
             }
         }
 
-        public void GoToReportPage()
+        public TollReportPage GoToReportPage()
         {
+            IWebDriver driver = WebDriver.ChromeDriver;
+
             //launch the web
-            driver.Navigate().GoToUrl(Jobj["TollURL"].ToString());
+            driver.Navigate().GoToUrl(sheet.GetRow(1).GetCell(3).StringCellValue);
+            return new TollReportPage();
+        }
+
+        public void DownloadGoodsDocument()
+        {
+            GoToReportPage();
+            GoodReportLink.Click();
+
         }
     }
 }
