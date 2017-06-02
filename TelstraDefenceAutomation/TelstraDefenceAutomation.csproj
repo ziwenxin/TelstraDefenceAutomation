@@ -83,6 +83,18 @@
       <Project>{c6239a40-5e75-446a-b255-e8f42b455b44}</Project>
       <Name>BusinessObjects</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{60bff519-c042-4384-894d-1be622fa2a4d}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Exceptions\Exceptions.csproj">
+      <Project>{1484f1b1-c765-4de2-bfd6-d62869d01f1d}</Project>
+      <Name>Exceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PropertyCollection\PropertyCollection.csproj">
+      <Project>{7b49abea-fac1-444e-ba47-a3550f29d763}</Project>
+      <Name>PropertyCollection</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Selenium.WebDriver.ChromeDriver.2.29.0\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.ChromeDriver.2.29.0\build\Selenium.WebDriver.ChromeDriver.targets')" />

@@ -14,7 +14,16 @@ namespace PropertyCollection
 
         static WebDriver()
         {
-            ChromeDriver = new ChromeDriver();
+            
+        }
+
+        public static void Init(string path)
+        {
+            //change the download location
+            var chromeOptions = new ChromeOptions();
+            chromeOptions.AddUserProfilePreference("download.default_directory", path);
+            chromeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
+            ChromeDriver = new ChromeDriver(chromeOptions);
         }
     }
 }

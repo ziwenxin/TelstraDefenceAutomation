@@ -2,43 +2,79 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NPOI.SS.UserModel;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.PageObjects;
+using OpenQA.Selenium.Support.UI;
 using PropertyCollection;
 
 namespace BusinessObjects
 {
     public class TollReportPage
     {
-        private ISheet sheet;
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl03_txtValue")]
+        public IWebElement FromDateField { get; set; }
 
-        [FindsBy(How = How.XPath, Using = "//a[text()='TelDef - Goods Receipt By Date Range']")]
-        public IWebElement GoodReportLink { get; set; }
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl05_txtValue")]
+        public IWebElement ToDateField { get; set; }
 
-        [FindsBy(How = How.XPath,Using = "//iframe")]
-        public IWebElement ReportFrame { get; set; }
 
-        public TollReportPage(ISheet sheet)
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl07_txtValue")]
+        public IWebElement OwnerIdCbl { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl07_divDropDown_ctl08")]
+        public IWebElement OwnerIdCb { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl00")]
+        public IWebElement ViewReportBtn { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")]
+        public IWebElement SaveIcon { get; set; }
+
+        [FindsBy(How = How.XPath,Using = "//a[@title='Excel']")]
+        public IWebElement ExcelSaveLink { get; set; }
+
+
+        public TollReportPage()
         {
-            this.sheet = sheet;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
 
-        public void GoToReportPage()
+        public void AddFilter()
         {
-            WebDriver.ChromeDriver.Navigate().GoToUrl(sheet.GetRow(1).GetCell(3).StringCellValue);
-            //swtich to report frame
-            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
+            //the data range should be from the first date of this year to today
+            int thisYear = DateTime.Now.Year;
+            FromDateField.SendKeys(new DateTime(thisYear, 1, 1).ToString());
+            ToDateField.SendKeys(DateTime.Today.ToString());
+            OwnerIdCbl.Click();
+            OwnerIdCb.Click();
+
 
         }
 
-        public void DownloadGoodsDocument()
+        public void GenerateReport()
         {
-            GoToReportPage();
-            GoodReportLink.Click();
-
+            AddFilter();
+            ViewReportBtn.Click();
+            
         }
+
+        public void DownLoadReport()
+        {
+            IWebDriver driver = WebDriver.ChromeDriver;
+            GenerateReport();
+            //wait until the save icon exists
+            WebDriverWait wait=new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            wait.Until(ExpectedConditions.ElementExists(By.Id("ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")));
+            Thread.Sleep(1000);
+
+            SaveIcon.Click();
+            ExcelSaveLink.Click();
+        }
+
+
     }
 }
