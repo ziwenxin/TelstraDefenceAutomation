@@ -22,12 +22,13 @@ namespace TelstraDefenceAutomation
         static void Main(string[] args)
         {
             //read settings and set default download folder for chrome
-            ISheet configsheet = Intialization();
+            ISheet configSheet = Intialization();
 
-            //DownLoadDocuments(configsheet);
+            DownLoadDocuments(configSheet);
 
             //delete several lines at the beginning
-            ProcessExcels(configsheet);
+            ProcessExcels(configSheet);
+
 
             Exit();
 
@@ -37,31 +38,32 @@ namespace TelstraDefenceAutomation
 
         }
 
-        private static void ProcessExcels(ISheet configsheet)
+        private static void ProcessExcels(ISheet configSheet)
         {
+
+
             //get total report numbers
             try
             {
-                int totalReportNum = (int)configsheet.GetRow(5).GetCell(1).NumericCellValue;
+                int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
                 for (int i = 0; i < totalReportNum; i++)
                 {
                     //read from report
-                    string savePath = configsheet.GetRow(4).GetCell(1).StringCellValue;
-                    string filename = configsheet.GetRow(6).GetCell(1 + i).StringCellValue;
+                    string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
+                    string filename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
                     string filepath = savePath + filename;
-                    int linesToBeDeleted = (int)configsheet.GetRow(7).GetCell(1 + i).NumericCellValue;
+                    //wait until file exists
+                    while (!File.Exists(filepath+".xlsx"))
+                        Thread.Sleep(500);
+                    int linesToBeDeleted = (int)configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
                     ISheet reportsheet = ExcelHelper.ReadExcel(filepath + ".xlsx");
-                    //delete the several lines
-                    for (int j = 0; j < linesToBeDeleted; j++)
-                    {
-                        IRow row = reportsheet.GetRow(j);
-                        reportsheet.RemoveRow(row);
-                    }
-                    //move the rows below to the top
 
+                    //do the archive
+                    MoveFileToArchive(savePath, filename);
                     //save
-                    ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx");
+                    ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
                 }
+
             }
             catch (Exception e)
             {
@@ -74,6 +76,7 @@ namespace TelstraDefenceAutomation
 
         private static ISheet Intialization()
         {
+            int retryCount = 3;
             //read data
             ISheet sheet = ExcelHelper.ReadExcel("TollData.xlsx");
 
@@ -82,16 +85,31 @@ namespace TelstraDefenceAutomation
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             //change default download location
-            WebDriver.Init(path);
+            try
+            {
+                WebDriver.Init(path);
+            }
+            //retry at most 3 times to initalize the driver
+            catch (Exception e)
+            {
+                if (retryCount <= 0)
+                {
+                    Console.WriteLine(e.Message);
+                    Exit();
+                }
+                WebDriver.ChromeDriver.Quit();
+                WebDriver.Init(path);
+                retryCount--;
+            }
             return sheet;
         }
 
-        private static void DownLoadDocuments(ISheet configsheet)
+        private static void DownLoadDocuments(ISheet configSheet)
         {
             //login
             try
             {
-                TollLoginPage tlp = new TollLoginPage(configsheet);
+                TollLoginPage tlp = new TollLoginPage(configSheet);
                 TollReportDownloadPage trdlp = tlp.Login();
                 //download first document
                 TollReportPage tgp = trdlp.DownloadGoodsDocument();
@@ -111,9 +129,30 @@ namespace TelstraDefenceAutomation
 
         }
 
-        private static void MoveFileToArchive()
+        private static void MoveFileToArchive(string savePath, string filename)
         {
-            
+            //save set archivepath and archive file name
+            string archivePath = savePath + "Archive/";
+            if (!Directory.Exists(archivePath))
+                Directory.CreateDirectory(archivePath);
+            //set date format
+            string dateStr = DateTime.Today.ToString("d");
+            dateStr = dateStr.Replace("/", "-");
+            //set a data folder in the archive folder
+            archivePath += dateStr + "/";
+            if (!Directory.Exists(archivePath))
+                Directory.CreateDirectory(archivePath);
+            string archiveFilename = filename + " " + dateStr;
+            //set destination path and original path
+            string OriginalPath = savePath + filename + ".xlsx";
+            string dstPath = archivePath + archiveFilename + ".xlsx";
+            //if the archive file exists, delete it
+            if (File.Exists(dstPath))
+                File.Delete(dstPath);
+            //copy the file to archive folder
+            File.Copy(OriginalPath, dstPath);
+            //delete the original file
+            File.Delete(OriginalPath);
         }
 
         private static void Exit()

@@ -68,9 +68,8 @@ namespace BusinessObjects
             GenerateReport();
             //wait until the save icon exists
             WebDriverWait wait=new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-            wait.Until(ExpectedConditions.ElementExists(By.Id("ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")));
             Thread.Sleep(1000);
-
             SaveIcon.Click();
             ExcelSaveLink.Click();
         }
