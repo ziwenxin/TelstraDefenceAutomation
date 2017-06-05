@@ -56,9 +56,10 @@ namespace Common
                 }
 
                 //autosize the columns
-                for (int i = 0; i < newSheet.LastRowNum; i++)
+                for (int i = 0; i < sheet.GetRow(0).PhysicalNumberOfCells; i++)
                 {
                     newSheet.AutoSizeColumn(i);
+
                 }
 
                 saveWorkbook.Write(fs);

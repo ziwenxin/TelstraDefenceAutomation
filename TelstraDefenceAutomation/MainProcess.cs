@@ -57,7 +57,7 @@ namespace TelstraDefenceAutomation
             try
             {
                 int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-                for (int i = 0; i < 1; i++)
+                for (int i = 0; i < totalReportNum; i++)
                 {
                     //read from report
                     string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
@@ -93,15 +93,19 @@ namespace TelstraDefenceAutomation
         //delete all files but not folders in a folder
         private static void DeleteAllFiles(string path)
         {
+            Console.WriteLine("Deleting all previous files...");
             DirectoryInfo di=new DirectoryInfo(path);
             foreach (FileInfo fileInfo in di.GetFiles())
             {
                 fileInfo.Delete();
             }
+            Console.WriteLine("Delete completed");
         }
 
         private static ISheet Intialization()
         {
+            Console.WriteLine("Inialising...");
+
             int retryCount = 3;
             //read data
             ISheet sheet = ExcelHelper.ReadExcel("Config.xlsx");
@@ -132,30 +136,36 @@ namespace TelstraDefenceAutomation
                     retryCount--;
                 }
             }
-
+            Console.WriteLine("Initialization completed");
             return sheet;
         }
 
         private static void DownLoadDocuments(ISheet configSheet)
         {
-
+            Console.WriteLine("DownLoading documents from Toll...");
             //login
             try
             {
                 TollLoginPage tollLoginPage = new TollLoginPage(configSheet);
                 TollReportDownloadPage tollDownloadPage = tollLoginPage.Login();
                 //download first document
-                //TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
-                //tollGoodReportPage.DownLoadReport();
-                //TollShipDetailPage tollShipDetailPage = tollDownloadPage.DownLoadShipDetail();
-                //tollShipDetailPage.DownLoadReport();
-                TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
+                TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
+                tollGoodReportPage.DownLoadReport();
+                Console.WriteLine("TelDef - Goods Receipt By Date Range download completed");
+                //download 2nd
+                TollShipOrderPage tollShipDetailPage = new TollReportDownloadPage(configSheet).DownLoadShipDetail();
+                tollShipDetailPage.DownLoadReport();
+                Console.WriteLine("TelDef - Shipped Order Report download completed");
+
+                //download the 3rd 
+                TollSOHDetailPage tollSohDetailPage = new TollReportDownloadPage(configSheet).DownloadSOHDetail();
                 tollSohDetailPage.DownLoadReport();
+                Console.WriteLine("TelDef - SOH Detail Report download completed");
 
             }
             catch (NoReportsException reportsException)
             {
-                Console.WriteLine("The 'TollTotalDocuments' cell could be emtry");
+                Console.WriteLine("The 'TollTotalDocuments' cell could not be emtry");
                 Exit();
             }
             catch (Exception e)

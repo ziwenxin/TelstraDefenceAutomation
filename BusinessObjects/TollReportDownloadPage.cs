@@ -26,10 +26,9 @@ namespace BusinessObjects
 
         public TollReportDownloadPage(ISheet Configsheet)
         {
-            //get configsheet and driver
+            //get configsheet and WebDriver.ChromeDriver
             this.configSheet = Configsheet;
-            IWebDriver driver = WebDriver.ChromeDriver;
-            PageFactory.InitElements(driver, this);
+            PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
             //find elements with the file names from config file
             int totalDocuments = (int) configSheet.GetRow(5).GetCell(1).NumericCellValue;
@@ -37,11 +36,12 @@ namespace BusinessObjects
                 throw new NoReportsException();
             //swtich to report frame
             GoToReportPage();
+            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
             //set links
-            GoodReportLink = driver.FindElement(By.XPath("//a[text()='"+configSheet.GetRow(6).GetCell(1).StringCellValue+"']"));
-            ShipDetailLink = driver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']"));
-            SOHDetailLink = driver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']"));
+            GoodReportLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='"+configSheet.GetRow(6).GetCell(1).StringCellValue+"']"));
+            ShipDetailLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']"));
+            SOHDetailLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']"));
 
 
 
@@ -50,7 +50,6 @@ namespace BusinessObjects
         public void GoToReportPage()
         {
             WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(3).GetCell(1).StringCellValue);
-            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
         }
 
@@ -62,12 +61,12 @@ namespace BusinessObjects
             return new TollGoodReportPage();
         }
 
-        public TollShipDetailPage DownLoadShipDetail()
+        public TollShipOrderPage DownLoadShipDetail()
         {
             //go to report page and click the link
 
             ShipDetailLink.Click();
-            return new TollShipDetailPage();
+            return new TollShipOrderPage();
         }
 
         public TollSOHDetailPage DownloadSOHDetail()

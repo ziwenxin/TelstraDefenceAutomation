@@ -79,7 +79,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TollReportDownloadPage.cs" />
     <Compile Include="TollReportPage.cs" />
-    <Compile Include="TollShipDetailPage.cs" />
+    <Compile Include="TollShipOrderPage.cs" />
     <Compile Include="TollSOHDetailPage.cs" />
   </ItemGroup>
   <ItemGroup>

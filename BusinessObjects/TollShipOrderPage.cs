@@ -9,7 +9,7 @@ using PropertyCollection;
 
 namespace BusinessObjects
 {
-    public class TollShipDetailPage :TollReportPage
+    public class TollShipOrderPage :TollReportPage
     {
 
 
@@ -26,7 +26,7 @@ namespace BusinessObjects
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl07_cbNull")]
         public IWebElement ToDateCheckBox { get; set; }
 
-        public TollShipDetailPage()
+        public TollShipOrderPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 

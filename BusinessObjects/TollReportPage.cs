@@ -28,16 +28,16 @@ namespace BusinessObjects
         {
             IWebDriver driver = WebDriver.ChromeDriver;
             //wait for the page loaded
-            WebDriverWait Pagewait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-            Pagewait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ReportViewer1_ctl04_ctl00")));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ReportViewer1_ctl04_ctl00")));
             //add filter and generate the report
             AddFilter();
             ViewReportBtn.Click();
 
-            Thread.Sleep(1000);
+            //waut until the loading appears
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("ReportViewer1_AsyncWait_Wait")));
             //wait until the loading finish
-            WebDriverWait loadWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-            loadWait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));
+            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));
             SaveIcon.Click();
             ExcelSaveLink.Click();
         }

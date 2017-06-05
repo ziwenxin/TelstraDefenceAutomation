@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Exceptions;
 using NPOI.HSSF.UserModel;
@@ -47,6 +48,8 @@ namespace BusinessObjects
         {
             IWebDriver driver = WebDriver.ChromeDriver;
 
+            //wait for 2 secs 
+            Thread.Sleep(2000);
             //launch the web
             driver.Navigate().GoToUrl(Configsheet.GetRow(0).GetCell(1).StringCellValue);
 
