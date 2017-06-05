@@ -21,13 +21,24 @@ namespace TelstraDefenceAutomation
     {
         static void Main(string[] args)
         {
-            //read settings and set default download folder for chrome
-            ISheet configSheet = Intialization();
+            try
+            {
+                //read settings and set default download folder for chrome
+                ISheet configSheet = Intialization();
 
-            DownLoadDocuments(configSheet);
+                //before automation, delete all files in the save folder
+                DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-            //delete several lines at the beginning
-            ProcessExcels(configSheet);
+                DownLoadDocuments(configSheet);
+
+                //delete several lines at the beginning
+                ProcessExcels(configSheet);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+
+            }
 
 
             Exit();
@@ -53,7 +64,7 @@ namespace TelstraDefenceAutomation
                     string filename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
                     string filepath = savePath + filename;
                     //wait until file exists
-                    while (!File.Exists(filepath+".xlsx"))
+                    while (!File.Exists(filepath + ".xlsx"))
                         Thread.Sleep(500);
                     int linesToBeDeleted = (int)configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
                     ISheet reportsheet = ExcelHelper.ReadExcel(filepath + ".xlsx");
@@ -74,33 +85,46 @@ namespace TelstraDefenceAutomation
 
         }
 
+        //delete all files but not folders in a folder
+        private static void DeleteAllFiles(string path)
+        {
+            DirectoryInfo di=new DirectoryInfo(path);
+            foreach (FileInfo fileInfo in di.GetFiles())
+            {
+                fileInfo.Delete();
+            }
+        }
+
         private static ISheet Intialization()
         {
             int retryCount = 3;
             //read data
-            ISheet sheet = ExcelHelper.ReadExcel("TollData.xlsx");
+            ISheet sheet = ExcelHelper.ReadExcel("Config.xlsx");
 
             //check if the download folder exists, if not create one
             string path = sheet.GetRow(4).GetCell(1).StringCellValue;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             //change default download location
-            try
+            while (true)
             {
-                WebDriver.Init(path);
-            }
-            //retry at most 3 times to initalize the driver
-            catch (Exception e)
-            {
-                if (retryCount <= 0)
+                try
                 {
-                    Console.WriteLine(e.Message);
-                    Exit();
+                    WebDriver.Init(path);
+                    break;
                 }
-                WebDriver.ChromeDriver.Quit();
-                WebDriver.Init(path);
-                retryCount--;
+                //retry at most 3 times to initalize the driver
+                catch (Exception e)
+                {
+                    if (retryCount <= 0)
+                    {
+                        Console.WriteLine(e.Message);
+                        Exit();
+                    }
+                    retryCount--;
+                }
             }
+
             return sheet;
         }
 
@@ -161,6 +185,7 @@ namespace TelstraDefenceAutomation
             //close the automation
             Thread.Sleep(5000);
             WebDriver.ChromeDriver.Quit();
+            Environment.Exit(0);
         }
 
 

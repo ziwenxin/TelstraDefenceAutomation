@@ -21,7 +21,7 @@ namespace BusinessObjects
         //store data from json
         private ISheet Configsheet;
 
-        [FindsBy(How = How.Id,Using = "UserName")]
+        [FindsBy(How = How.Id, Using = "UserName")]
         public IWebElement UserNameField { get; set; }
 
         [FindsBy(How = How.Id, Using = "Password")]
@@ -37,35 +37,54 @@ namespace BusinessObjects
         {
             //inital
             this.Configsheet = Configsheet;
-            if (WebDriver.ChromeDriver.Title == "Untitled")
-            {
-                throw new Exception("Failed to initialize");
-            }
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
-        
+
         }
 
-        
+        public void GoToLoginPage()
+        {
+            IWebDriver driver = WebDriver.ChromeDriver;
+
+            //launch the web
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(20);
+            driver.Navigate().GoToUrl(Configsheet.GetRow(0).GetCell(1).StringCellValue);
+
+            //wait until the save icon exists
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
+            wait.Until(ExpectedConditions.ElementExists(By.Id("UserName")));
+
+        }
+
+
         public TollReportDownloadPage Login()
         {
 
-                IWebDriver driver = WebDriver.ChromeDriver;
+            int retryCount = 3;
+            //retry 3 times to go to url
+            while (true)
+            {
+                try
+                {
+                    GoToLoginPage();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    if (retryCount <= 0)
+                        throw e;
+                    retryCount--;
+                }
+            }
 
-                //launch the web
-                driver.Navigate().GoToUrl(Configsheet.GetRow(0).GetCell(1).StringCellValue);
 
-                //wait until the save icon exists
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                wait.Until(ExpectedConditions.ElementExists(By.Id("UserName")));
-
-                //enter the credentials
-                UserNameField.SendKeys(Configsheet.GetRow(1).GetCell(1).StringCellValue);
-                PasswordField.SendKeys(Configsheet.GetRow(2).GetCell(1).StringCellValue);
-                //click login
-                LoginBtn.Click();
-                return new TollReportDownloadPage(Configsheet);
+            //enter the credentials
+            UserNameField.SendKeys(Configsheet.GetRow(1).GetCell(1).StringCellValue);
+            PasswordField.SendKeys(Configsheet.GetRow(2).GetCell(1).StringCellValue);
+            //click login
+            LoginBtn.Click();
+            return new TollReportDownloadPage(Configsheet);
         }
 
     }

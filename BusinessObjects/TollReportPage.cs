@@ -34,7 +34,7 @@ namespace BusinessObjects
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")]
         public IWebElement SaveIcon { get; set; }
 
-        [FindsBy(How = How.XPath,Using = "//a[@title='Excel']")]
+        [FindsBy(How = How.XPath, Using = "//a[@title='Excel']")]
         public IWebElement ExcelSaveLink { get; set; }
 
 
@@ -59,16 +59,16 @@ namespace BusinessObjects
         {
             AddFilter();
             ViewReportBtn.Click();
-            
+
         }
 
         public void DownLoadReport()
         {
             IWebDriver driver = WebDriver.ChromeDriver;
             GenerateReport();
-            //wait until the save icon exists
-            WebDriverWait wait=new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")));
+            //wait until the loading finish
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));
             Thread.Sleep(1000);
             SaveIcon.Click();
             ExcelSaveLink.Click();

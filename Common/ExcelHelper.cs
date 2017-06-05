@@ -52,7 +52,7 @@ namespace Common
                 {
                     IRow newRow = newSheet.CreateRow(i);
                     CopyRow(newRow, sheet.GetRow(i + linesToBeDeleted));
-                    
+
                 }
 
                 //autosize the columns
@@ -77,14 +77,22 @@ namespace Common
         //copy data in a cell
         private static void CopyCell(ICell newCell, ICell srcCell)
         {
+
             //copy due to cell type
             CellType srcCellType = srcCell.CellType;
             if (srcCellType == CellType.Numeric)
             {
-                newCell.SetCellValue(srcCell.NumericCellValue);
+                //it is date value
+                if (DateUtil.IsCellDateFormatted(srcCell))
+                {
+                    newCell.SetCellValue(srcCell.DateCellValue.ToString("d"));
+                }
+                else
+                    newCell.SetCellValue(srcCell.NumericCellValue);
             }
             else if (srcCellType == CellType.String)
             {
+
                 newCell.SetCellValue(srcCell.RichStringCellValue);
             }
             else if (srcCellType == CellType.Blank)
