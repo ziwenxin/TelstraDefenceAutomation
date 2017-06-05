@@ -8,6 +8,7 @@ using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using PropertyCollection;
+using OpenQA.Selenium.Support.UI;
 
 namespace BusinessObjects
 {
@@ -55,24 +56,32 @@ namespace BusinessObjects
 
         public TollGoodReportPage DownloadGoodDocument()
         {
-            //go to report page and click the link
-
+            //wait for the link appears
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(1).StringCellValue + "']")));
+            //click the link
             GoodReportLink.Click();
             return new TollGoodReportPage();
         }
 
-        public TollShipOrderPage DownLoadShipDetail()
+        public TollShipOrderPage DownLoadShipOrder()
         {
-            //go to report page and click the link
+            //wait for the link appears
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']")));
 
+            //click the link
             ShipDetailLink.Click();
             return new TollShipOrderPage();
         }
 
         public TollSOHDetailPage DownloadSOHDetail()
         {
-            //go to report page and click the link
+            //wait for the link appears
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']")));
 
+            //click on the link
             SOHDetailLink.Click();
             return new TollSOHDetailPage();
         }

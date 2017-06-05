@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects;
+using BusinessObjects.MERIDIAN;
 using Common;
 using Exceptions;
 using NPOI.SS.Formula.PTG;
@@ -29,10 +30,11 @@ namespace TelstraDefenceAutomation
                 //before automation, delete all files in the save folder
                 DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                DownLoadDocuments(configSheet);
+                DownLoadMeridianDocuments(configSheet);
+                //DownLoadTollDocuments(configSheet);
 
-                //delete several lines at the beginning
-                ProcessExcels(configSheet);
+                ////delete several lines at the beginning
+                //ProcessExcels(configSheet);
             }
             catch (Exception e)
             {
@@ -51,7 +53,7 @@ namespace TelstraDefenceAutomation
 
         private static void ProcessExcels(ISheet configSheet)
         {
-
+            Console.WriteLine("Processing Excel files...");
             int totalWaitMilliSecs = 0;
             //get total report numbers
             try
@@ -78,6 +80,7 @@ namespace TelstraDefenceAutomation
                     MoveFileToArchive(savePath, filename);
                     //save
                     ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
+                    Console.WriteLine(filename+" process completed");
                 }
 
             }
@@ -140,7 +143,7 @@ namespace TelstraDefenceAutomation
             return sheet;
         }
 
-        private static void DownLoadDocuments(ISheet configSheet)
+        private static void DownLoadTollDocuments(ISheet configSheet)
         {
             Console.WriteLine("DownLoading documents from Toll...");
             //login
@@ -153,7 +156,7 @@ namespace TelstraDefenceAutomation
                 tollGoodReportPage.DownLoadReport();
                 Console.WriteLine("TelDef - Goods Receipt By Date Range download completed");
                 //download 2nd
-                TollShipOrderPage tollShipDetailPage = new TollReportDownloadPage(configSheet).DownLoadShipDetail();
+                TollShipOrderPage tollShipDetailPage = new TollReportDownloadPage(configSheet).DownLoadShipOrder();
                 tollShipDetailPage.DownLoadReport();
                 Console.WriteLine("TelDef - Shipped Order Report download completed");
 
@@ -175,6 +178,15 @@ namespace TelstraDefenceAutomation
 
             }
 
+        }
+
+        private static void DownLoadMeridianDocuments(ISheet configSheet)
+        {
+            Console.WriteLine("Downloading Meridian documents...");
+            //go to the portal of meridian
+            MeridianPortalPage meridianPortalPage=new MeridianPortalPage(configSheet);
+            MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
+            meridianNavigationPage.GotoPoDetail();
         }
 
         private static void MoveFileToArchive(string savePath, string filename)
