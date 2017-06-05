@@ -121,6 +121,9 @@ namespace TelstraDefenceAutomation
                 //retry at most 3 times to initalize the driver
                 catch (Exception e)
                 {
+                    //close the previous window
+                    if(WebDriver.ChromeDriver!=null)
+                        WebDriver.ChromeDriver.Quit();
                     if (retryCount <= 0)
                     {
                         Console.WriteLine(e.Message);
@@ -135,14 +138,20 @@ namespace TelstraDefenceAutomation
 
         private static void DownLoadDocuments(ISheet configSheet)
         {
+
             //login
             try
             {
-                TollLoginPage tlp = new TollLoginPage(configSheet);
-                TollReportDownloadPage trdlp = tlp.Login();
+                TollLoginPage tollLoginPage = new TollLoginPage(configSheet);
+                TollReportDownloadPage tollDownloadPage = tollLoginPage.Login();
                 //download first document
-                TollGoodReportPage tgp = trdlp.DownloadGoodDocument();
-                tgp.DownLoadReport();
+                //TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
+                //tollGoodReportPage.DownLoadReport();
+                //TollShipDetailPage tollShipDetailPage = tollDownloadPage.DownLoadShipDetail();
+                //tollShipDetailPage.DownLoadReport();
+                TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
+                tollSohDetailPage.DownLoadReport();
+
             }
             catch (NoReportsException reportsException)
             {

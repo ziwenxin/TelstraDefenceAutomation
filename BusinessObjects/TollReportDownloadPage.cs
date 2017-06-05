@@ -66,7 +66,7 @@ namespace BusinessObjects
         {
             //go to report page and click the link
 
-            GoodReportLink.Click();
+            ShipDetailLink.Click();
             return new TollShipDetailPage();
         }
 

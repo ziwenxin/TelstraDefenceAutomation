@@ -10,23 +10,17 @@ namespace BusinessObjects
 {
     public class TollSOHDetailPage : TollReportPage
     {
-        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl00")]
-        public IWebElement ViewReportBtn { get; set; }
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl03_txtValue")]
+        public IWebElement OwnerIdCbl { get; set; }
 
-        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl05_ctl04_ctl00_ButtonImg")]
-        public IWebElement SaveIcon { get; set; }
-
-        [FindsBy(How = How.XPath, Using = "//a[@title='Excel']")]
-        public IWebElement ExcelSaveLink { get; set; }
+        [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl03_divDropDown_ctl08")]
+        public IWebElement OwnerIdCb { get; set; }
 
         public override void AddFilter()
         {
-            throw new NotImplementedException();
-        }
-
-        public override void DownLoadReport()
-        {
-            throw new NotImplementedException();
+            //choose owner
+            OwnerIdCbl.Click();
+            OwnerIdCb.Click();
         }
     }
 }

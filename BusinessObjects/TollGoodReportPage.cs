@@ -51,20 +51,6 @@ namespace BusinessObjects
        
 
 
-        public override void DownLoadReport()
-        {
-            //add filter and generate the report
-            AddFilter();
-            ViewReportBtn.Click();
-
-            IWebDriver driver = WebDriver.ChromeDriver;
-            //wait until the loading finish
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));
-            Thread.Sleep(1000);
-            SaveIcon.Click();
-            ExcelSaveLink.Click();
-        }
 
 
     }
