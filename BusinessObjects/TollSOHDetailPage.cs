@@ -8,7 +8,7 @@ using OpenQA.Selenium.Support.PageObjects;
 
 namespace BusinessObjects
 {
-    public abstract class TollReportPage
+    public class TollSOHDetailPage : TollReportPage
     {
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl00")]
         public IWebElement ViewReportBtn { get; set; }
@@ -19,8 +19,14 @@ namespace BusinessObjects
         [FindsBy(How = How.XPath, Using = "//a[@title='Excel']")]
         public IWebElement ExcelSaveLink { get; set; }
 
-        public abstract void AddFilter();
-        public abstract void DownLoadReport();
+        public override void AddFilter()
+        {
+            throw new NotImplementedException();
+        }
 
+        public override void DownLoadReport()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

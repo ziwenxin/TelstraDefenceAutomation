@@ -15,7 +15,11 @@ namespace BusinessObjects
     {
         private ISheet configSheet;
 
-        public List<IWebElement> ReportLinks { get; set; }
+        public IWebElement GoodReportLink { get; set; }
+
+        public IWebElement ShipDetailLink { get; set; }
+
+        public IWebElement SOHDetailLink { get; set; }
 
         [FindsBy(How = How.XPath, Using = "//iframe")]
         public IWebElement ReportFrame { get; set; }
@@ -27,42 +31,51 @@ namespace BusinessObjects
             IWebDriver driver = WebDriver.ChromeDriver;
             PageFactory.InitElements(driver, this);
 
-            //get total report numbers
-            int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-            if (totalReportNum <= 0)
+            //find elements with the file names from config file
+            int totalDocuments = (int) configSheet.GetRow(5).GetCell(1).NumericCellValue;
+            if (totalDocuments <= 0)
                 throw new NoReportsException();
             //swtich to report frame
             GoToReportPage();
-            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
-            ReportLinks = new List<IWebElement>();
-            //get reports names and find the link
-            for (int i = 0; i < totalReportNum; i++)
-            {
-                string reportName = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
-                IWebElement webElement = driver.FindElement(By.XPath("//a[text()='" + reportName + "']"));
-                ReportLinks.Add(webElement);
 
-            }
+            //set links
+            GoodReportLink = driver.FindElement(By.XPath("//a[text()='"+configSheet.GetRow(6).GetCell(1).StringCellValue+"']"));
+            ShipDetailLink = driver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']"));
+            SOHDetailLink = driver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']"));
+
+
 
         }
 
         public void GoToReportPage()
         {
             WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(3).GetCell(1).StringCellValue);
-
+            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
         }
 
-        public TollReportPage DownloadGoodsDocument()
+        public TollGoodReportPage DownloadGoodDocument()
         {
-            //click the link to download
-            for (int i = 0; i < ReportLinks.Count; i++)
-            {
-                if (i != 0)
-                    GoToReportPage();
-                ReportLinks[i].Click();
-            }
-            return new TollReportPage();
+            //go to report page and click the link
+
+            GoodReportLink.Click();
+            return new TollGoodReportPage();
+        }
+
+        public TollShipDetailPage DownLoadShipDetail()
+        {
+            //go to report page and click the link
+
+            GoodReportLink.Click();
+            return new TollShipDetailPage();
+        }
+
+        public TollSOHDetailPage DownloadSOHDetail()
+        {
+            //go to report page and click the link
+
+            SOHDetailLink.Click();
+            return new TollSOHDetailPage();
         }
     }
 

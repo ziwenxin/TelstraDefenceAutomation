@@ -52,12 +52,12 @@ namespace TelstraDefenceAutomation
         private static void ProcessExcels(ISheet configSheet)
         {
 
-
+            int totalWaitMilliSecs = 0;
             //get total report numbers
             try
             {
                 int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-                for (int i = 0; i < totalReportNum; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     //read from report
                     string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
@@ -65,7 +65,12 @@ namespace TelstraDefenceAutomation
                     string filepath = savePath + filename;
                     //wait until file exists
                     while (!File.Exists(filepath + ".xlsx"))
+                    {
                         Thread.Sleep(500);
+                        totalWaitMilliSecs += 500;
+                        if(totalWaitMilliSecs>20000)
+                            throw new Exception( filename+" is not downloaded");
+                    }
                     int linesToBeDeleted = (int)configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
                     ISheet reportsheet = ExcelHelper.ReadExcel(filepath + ".xlsx");
 
@@ -136,7 +141,7 @@ namespace TelstraDefenceAutomation
                 TollLoginPage tlp = new TollLoginPage(configSheet);
                 TollReportDownloadPage trdlp = tlp.Login();
                 //download first document
-                TollReportPage tgp = trdlp.DownloadGoodsDocument();
+                TollGoodReportPage tgp = trdlp.DownloadGoodDocument();
                 tgp.DownLoadReport();
             }
             catch (NoReportsException reportsException)

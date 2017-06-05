@@ -48,11 +48,10 @@ namespace BusinessObjects
             IWebDriver driver = WebDriver.ChromeDriver;
 
             //launch the web
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(20);
             driver.Navigate().GoToUrl(Configsheet.GetRow(0).GetCell(1).StringCellValue);
 
             //wait until the save icon exists
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             wait.Until(ExpectedConditions.ElementExists(By.Id("UserName")));
 
         }
