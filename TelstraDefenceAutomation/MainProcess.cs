@@ -30,8 +30,8 @@ namespace TelstraDefenceAutomation
                 //before automation, delete all files in the save folder
                 DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                DownLoadTollDocuments(configSheet);
-                //DownLoadMeridianDocuments(configSheet);
+                //DownLoadTollDocuments(configSheet);
+                DownLoadMeridianDocuments(configSheet);
 
                 ////delete several lines at the beginning
                 //ProcessExcels(configSheet);
@@ -39,7 +39,8 @@ namespace TelstraDefenceAutomation
             catch (Exception e)
             {
                 Console.WriteLine(e);
-
+                Console.WriteLine("\r\n Press Any Key To Exit");
+                Console.ReadKey();
             }
 
 
@@ -189,10 +190,14 @@ namespace TelstraDefenceAutomation
             MeridianPortalPage meridianPortalPage=new MeridianPortalPage(configSheet);
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
             //go to PO detail
-            MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetail(configSheet);
+            MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetailEntryPage(configSheet);
             MeridianPOAccountDetailPage meridianPoAccountDetailPage=meridianVariableEntryPage.EnterVarible();
             //click open button select detail
             MeridianPopUpWindow meridianPopUpWindow = meridianPoAccountDetailPage.OpenPoPUpWindow();
+            meridianPopUpWindow.SelectPODetailDoc();
+            //download PO Detail Reprrt
+            meridianPoAccountDetailPage.DownLoadPoDetailDoc();
+            Console.WriteLine("Po Detail download completed");
         }
 
         private static void MoveFileToArchive(string savePath, string filename)

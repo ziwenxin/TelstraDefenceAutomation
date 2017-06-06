@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Remote;
 
 namespace PropertyCollection
 {
@@ -23,6 +24,11 @@ namespace PropertyCollection
             var chromeOptions = new ChromeOptions();
             chromeOptions.AddUserProfilePreference("download.default_directory", path);
             chromeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
+            //enbale pop up windows
+            chromeOptions.AddArgument("test-type");
+            chromeOptions.AddArgument("disable-popup-blocking");
+            DesiredCapabilities capabilities = DesiredCapabilities.Chrome();
+            capabilities.SetCapability(ChromeOptions.Capability, chromeOptions);
             ChromeDriver = new ChromeDriver(chromeOptions);
         }
     }

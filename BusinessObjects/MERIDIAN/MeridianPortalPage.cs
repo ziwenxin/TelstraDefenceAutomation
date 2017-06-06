@@ -39,8 +39,9 @@ namespace BusinessObjects.MERIDIAN
                     WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(9).GetCell(1).StringCellValue);
                     //wait for the image appears
                     WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-                    wait.Until(ExpectedConditions.ElementExists(By.Id("2406890")));
-
+                    wait.Until(ExpectedConditions.ElementIsVisible(By.Id("2406890")));
+                    //click it
+                    MeridianLaunchImg.Click();
                     break;
                 }
                 catch (Exception e)
@@ -52,8 +53,7 @@ namespace BusinessObjects.MERIDIAN
 
 
             }
-            //click it
-            MeridianLaunchImg.Click();
+ 
             return new MeridianNavigationPage();
         }
     }

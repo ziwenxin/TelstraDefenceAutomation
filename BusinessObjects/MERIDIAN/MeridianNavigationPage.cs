@@ -30,7 +30,7 @@ namespace BusinessObjects.MERIDIAN
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
 
-        public MeridianVariableEntryPage GotoPoDetail(ISheet configSheet)
+        public MeridianVariableEntryPage GotoPoDetailEntryPage(ISheet configSheet)
         {
             //wait general report link exists
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));

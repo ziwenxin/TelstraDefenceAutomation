@@ -17,6 +17,9 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id, Using = "urPopupInner0")]
         public IWebElement PopUpFrame { get; set; }
 
+        [FindsBy(How = How.Id, Using = "iframe_Roundtrip_9223372034830153341")]
+        public IWebElement InputFrame { get; set; }
+
         public MeridianCenterPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver,this);

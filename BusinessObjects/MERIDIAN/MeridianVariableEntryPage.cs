@@ -18,14 +18,12 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id,Using = "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")]
         public IWebElement TelProfitCenterField { get; set; }
 
-        [FindsBy(How = How.Id,Using = "iframe_Roundtrip_9223372034830153341")]
-        public IWebElement InputFrame { get; set; }
+
 
         [FindsBy(How = How.Id,Using = "DLG_VARIABLE_dlgBase_BTNOK")]
         public IWebElement OKBtn { get; set; }
 
-        [FindsBy(How = How.XPath,Using = "//img[@src=' / com.sap.ip.bi.web.portal.mimes / base / images / generic / pixel.gif ? version = AyqckNPrka7NCmWJEfbIYw % 3D % 3D']")]
-        public IWebElement LoadingImg { get; set; }
+
 
         public MeridianVariableEntryPage(ISheet configSheet)
         {
@@ -54,7 +52,7 @@ namespace BusinessObjects.MERIDIAN
             //get code from config file
             string code = ConfigSheet.GetRow(10).GetCell(1).StringCellValue;
             //wait for the input field
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")));
             //input
             TelProfitCenterField.SendKeys(code);
