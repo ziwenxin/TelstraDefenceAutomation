@@ -29,11 +29,29 @@ namespace BusinessObjects.MERIDIAN
 
         public MeridianNavigationPage LaunchMeridian()
         {
-            //go to launch url
-            WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(9).GetCell(1).StringCellValue);
-            //wait for the image appears
-            WebDriverWait wait=new WebDriverWait(WebDriver.ChromeDriver,TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementExists(By.Id("2406890")));
+            int retryCount = 3;
+            //retry 3 times
+            while (true)
+            {
+                try
+                {
+                    //go to launch url
+                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(9).GetCell(1).StringCellValue);
+                    //wait for the image appears
+                    WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
+                    wait.Until(ExpectedConditions.ElementExists(By.Id("2406890")));
+
+                    break;
+                }
+                catch (Exception e)
+                {
+                    if (retryCount <= 0)
+                        throw e;
+                    retryCount--;
+                }
+
+
+            }
             //click it
             MeridianLaunchImg.Click();
             return new MeridianNavigationPage();

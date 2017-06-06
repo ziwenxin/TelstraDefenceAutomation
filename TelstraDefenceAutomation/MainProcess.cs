@@ -30,8 +30,8 @@ namespace TelstraDefenceAutomation
                 //before automation, delete all files in the save folder
                 DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                DownLoadMeridianDocuments(configSheet);
                 //DownLoadTollDocuments(configSheet);
+                DownLoadMeridianDocuments(configSheet);
 
                 ////delete several lines at the beginning
                 //ProcessExcels(configSheet);
@@ -186,7 +186,9 @@ namespace TelstraDefenceAutomation
             //go to the portal of meridian
             MeridianPortalPage meridianPortalPage=new MeridianPortalPage(configSheet);
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
-            meridianNavigationPage.GotoPoDetail();
+            //go to PO detail
+            MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetail(configSheet);
+            meridianVariableEntryPage.EnterVarible();
         }
 
         private static void MoveFileToArchive(string savePath, string filename)

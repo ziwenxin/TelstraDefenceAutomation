@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
@@ -29,10 +30,10 @@ namespace BusinessObjects.MERIDIAN
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
 
-        public void GotoPoDetail()
+        public MeridianVariableEntryPage GotoPoDetail(ISheet configSheet)
         {
             //wait general report link exists
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(5));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
             wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='General Reporting']")));
 
             //click on general report link
@@ -42,8 +43,9 @@ namespace BusinessObjects.MERIDIAN
             //click on the Purchasing link
             PurchasingLink.Click();
             //wait PO detail link exists
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='PO Detail']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='PO Details']")));
             PODetailsLink.Click();
+            return new MeridianVariableEntryPage(configSheet);
         }
     }
 }

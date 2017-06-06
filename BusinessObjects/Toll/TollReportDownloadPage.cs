@@ -32,15 +32,32 @@ namespace BusinessObjects
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
             //find elements with the file names from config file
-            int totalDocuments = (int) configSheet.GetRow(5).GetCell(1).NumericCellValue;
+            int totalDocuments = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
             if (totalDocuments <= 0)
                 throw new NoReportsException();
             //swtich to report frame
-            GoToReportPage();
+            int retryCount = 3;//retry 3 times if fail to navigate
+            while (true)
+            {
+                try
+                {
+                    GoToReportPage();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    if (retryCount <= 0)
+                        throw e;
+                    retryCount--;
+                }
+
+            }
             WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
+
+
             //set links
-            GoodReportLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='"+configSheet.GetRow(6).GetCell(1).StringCellValue+"']"));
+            GoodReportLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(1).StringCellValue + "']"));
             ShipDetailLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']"));
             SOHDetailLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']"));
 
