@@ -188,7 +188,9 @@ namespace TelstraDefenceAutomation
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
             //go to PO detail
             MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetail(configSheet);
-            meridianVariableEntryPage.EnterVarible();
+            MeridianPOAccountDetailPage meridianPoAccountDetailPage=meridianVariableEntryPage.EnterVarible();
+            //click open button select detail
+            MeridianPopUpWindow meridianPopUpWindow = meridianPoAccountDetailPage.OpenPoPUpWindow();
         }
 
         private static void MoveFileToArchive(string savePath, string filename)

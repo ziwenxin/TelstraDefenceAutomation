@@ -30,7 +30,8 @@ namespace BusinessObjects.MERIDIAN
         public MeridianVariableEntryPage(ISheet configSheet)
         {
             ConfigSheet = configSheet;
-           PageFactory.InitElements(WebDriver.ChromeDriver, this);
+            PageFactory.InitElements(WebDriver.ChromeDriver, this);
+            //switch to sub frame
             WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             WebDriver.ChromeDriver.SwitchTo().Frame(InputFrame);
 
@@ -40,7 +41,7 @@ namespace BusinessObjects.MERIDIAN
         public void WaitForLoading()
         {
             //WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
             //wait for it disappears
             //wait for the loading img appears
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("QUERY_TITLE_TextItem")));
