@@ -16,10 +16,14 @@ namespace BusinessObjects
     {
         private ISheet configSheet;
 
+
+        [FindsBy(How = How.XPath, Using = "//a[text()='TelDef - Goods Receipt By Date Range']")]
         public IWebElement GoodReportLink { get; set; }
 
+        [FindsBy(How = How.XPath, Using = "//a[text()='TelDef - Shipped Order Report v2']")]
         public IWebElement ShipDetailLink { get; set; }
 
+        [FindsBy(How = How.XPath, Using = "//a[text()='TelDef - SOH Detail V2']")]
         public IWebElement SOHDetailLink { get; set; }
 
         [FindsBy(How = How.XPath, Using = "//iframe")]
@@ -52,14 +56,6 @@ namespace BusinessObjects
                 }
 
             }
-            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
-
-
-
-            //set links
-            GoodReportLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(1).StringCellValue + "']"));
-            ShipDetailLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']"));
-            SOHDetailLink = WebDriver.ChromeDriver.FindElement(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']"));
 
 
 
@@ -68,6 +64,8 @@ namespace BusinessObjects
         public void GoToReportPage()
         {
             WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(3).GetCell(1).StringCellValue);
+            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
+            WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
         }
 

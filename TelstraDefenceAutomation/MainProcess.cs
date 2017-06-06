@@ -30,8 +30,8 @@ namespace TelstraDefenceAutomation
                 //before automation, delete all files in the save folder
                 DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                //DownLoadTollDocuments(configSheet);
-                DownLoadMeridianDocuments(configSheet);
+                DownLoadTollDocuments(configSheet);
+                //DownLoadMeridianDocuments(configSheet);
 
                 ////delete several lines at the beginning
                 //ProcessExcels(configSheet);
@@ -156,12 +156,14 @@ namespace TelstraDefenceAutomation
                 tollGoodReportPage.DownLoadReport();
                 Console.WriteLine("TelDef - Goods Receipt By Date Range download completed");
                 //download 2nd
-                TollShipOrderPage tollShipDetailPage = new TollReportDownloadPage(configSheet).DownLoadShipOrder();
+                tollDownloadPage.GoToReportPage();
+                TollShipOrderPage tollShipDetailPage = tollDownloadPage.DownLoadShipOrder();
                 tollShipDetailPage.DownLoadReport();
                 Console.WriteLine("TelDef - Shipped Order Report download completed");
 
                 //download the 3rd 
-                TollSOHDetailPage tollSohDetailPage = new TollReportDownloadPage(configSheet).DownloadSOHDetail();
+                tollDownloadPage.GoToReportPage();
+                TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
                 tollSohDetailPage.DownLoadReport();
                 Console.WriteLine("TelDef - SOH Detail Report download completed");
 
