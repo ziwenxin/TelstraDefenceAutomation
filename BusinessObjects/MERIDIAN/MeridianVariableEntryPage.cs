@@ -16,9 +16,10 @@ namespace BusinessObjects.MERIDIAN
         public ISheet ConfigSheet { get; set; }
 
         [FindsBy(How = How.Id,Using = "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")]
-        public IWebElement TelProfitCenterField { get; set; }
+        public IWebElement POTelProfitCenterField { get; set; }
 
-
+        [FindsBy(How = How.Id, Using = "DLG_VARIABLE_vsc_cvl_VAR_2_INPUT_inp")]
+        public IWebElement AccountTelProfitCenterField { get; set; }
 
         [FindsBy(How = How.Id,Using = "DLG_VARIABLE_dlgBase_BTNOK")]
         public IWebElement OKBtn { get; set; }
@@ -29,9 +30,6 @@ namespace BusinessObjects.MERIDIAN
         {
             ConfigSheet = configSheet;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
-            //switch to sub frame
-            WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
-            WebDriver.ChromeDriver.SwitchTo().Frame(InputFrame);
 
 
         }
@@ -40,27 +38,57 @@ namespace BusinessObjects.MERIDIAN
         {
             //WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
-            //wait for it disappears
-            //wait for the loading img appears
+            //wait for the telstra img appears
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("QUERY_TITLE_TextItem")));
 
         }
 
-        public MeridianPOAccountDetailPage EnterVarible()
+        private MeridianPOAccountDetailPage EnterVarible(IWebElement inputField,IWebElement inputframe,string inputId,string frameId)
         {
+            //switch to certain frame
+            SwitchToFrame("isolatedWorkArea", frameId, inputframe);
+
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
+
 
             //get code from config file
             string code = ConfigSheet.GetRow(10).GetCell(1).StringCellValue;
             //wait for the input field
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(inputId)));
             //input
-            TelProfitCenterField.SendKeys(code);
+            inputField.SendKeys(code);
             //wait for ok button
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("DLG_VARIABLE_dlgBase_BTNOK")));
             OKBtn.Click();
             WaitForLoading();
             return new MeridianPOAccountDetailPage();
+        }
+
+        private void SwitchToFrame(string frameId1,string frameId2,IWebElement frame2)
+        {
+            //switch to correct frame
+            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
+
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(frameId1)));
+            //switch to sub frame
+            WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
+            //wait centre frame
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(frameId2)));
+            WebDriver.ChromeDriver.SwitchTo().Frame(frame2);
+        }
+
+        public MeridianPOAccountDetailPage AccountEnter()
+        {
+            return EnterVarible(AccountTelProfitCenterField, AccountDetailInputFrame, "DLG_VARIABLE_vsc_cvl_VAR_2_INPUT_inp",
+                "iframe_Roundtrip_9223372036154767051");
+        }
+
+        public MeridianPOAccountDetailPage PODetailEnter()
+        {
+            return EnterVarible(POTelProfitCenterField, PODetailInputFrame, "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp",
+                "iframe_Roundtrip_9223372034830153341");
+
         }
     }
 }

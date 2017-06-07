@@ -190,12 +190,22 @@ namespace TelstraDefenceAutomation
             MeridianPortalPage meridianPortalPage=new MeridianPortalPage(configSheet);
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
             //go to PO detail
-            MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetailEntryPage(configSheet);
-            MeridianPOAccountDetailPage meridianPoAccountDetailPage=meridianVariableEntryPage.EnterVarible();
-            //click open button select detail
+            //MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetailEntryPage(configSheet);
+            //MeridianPOAccountDetailPage meridianPoAccountDetailPage=meridianVariableEntryPage.EnterVarible();
+            ////click open button select detail
+            //MeridianPopUpWindow meridianPopUpWindow = meridianPoAccountDetailPage.OpenPoPUpWindow();
+            //meridianPopUpWindow.SelectPODetailDoc();
+            ////download PO Detail Reprrt
+            //meridianPoAccountDetailPage.DownLoadPoDetailDoc();
+            //Console.WriteLine("Po Detail download completed");
+
+            //go to account payable entry detail page
+            MeridianVariableEntryPage meridianVariableEntryPage = meridianNavigationPage.GotoAccountDetailEntryPage(configSheet);
+            MeridianPOAccountDetailPage meridianPoAccountDetailPage = meridianVariableEntryPage.AccountEnter();
+            ////click open button select detail
             MeridianPopUpWindow meridianPopUpWindow = meridianPoAccountDetailPage.OpenPoPUpWindow();
-            meridianPopUpWindow.SelectPODetailDoc();
-            //download PO Detail Reprrt
+            meridianPopUpWindow.SelectAccountDetailDoc();
+            ////download PO Detail Reprrt
             meridianPoAccountDetailPage.DownLoadPoDetailDoc();
             Console.WriteLine("Po Detail download completed");
         }

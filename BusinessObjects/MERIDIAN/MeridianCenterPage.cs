@@ -18,7 +18,10 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement PopUpFrame { get; set; }
 
         [FindsBy(How = How.Id, Using = "iframe_Roundtrip_9223372034830153341")]
-        public IWebElement InputFrame { get; set; }
+        public IWebElement PODetailInputFrame { get; set; }
+
+        [FindsBy(How = How.Id, Using = "iframe_Roundtrip_9223372036154767051")]
+        public IWebElement AccountDetailInputFrame { get; set; }
 
         public MeridianCenterPage()
         {

@@ -41,7 +41,7 @@ namespace BusinessObjects.MERIDIAN
             clickOkBtn();
         }
 
-        public void SelectAccountDetialDoc()
+        public void SelectAccountDetailDoc()
         {
             //wait the span valid
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));

@@ -22,6 +22,9 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.XPath, Using = "//a[text()='Purchasing']")]
         public IWebElement PurchasingLink { get; set; }
 
+        [FindsBy(How = How.XPath, Using = "//a[text()='Accounting Detail']")]
+        public IWebElement AccountDetailLink { get; set; }
+
         [FindsBy(How = How.XPath, Using = "//a[text()='PO Details']")]
         public IWebElement PODetailsLink { get; set; }
 
@@ -45,6 +48,24 @@ namespace BusinessObjects.MERIDIAN
             //wait PO detail link exists
             wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='PO Details']")));
             PODetailsLink.Click();
+            return new MeridianVariableEntryPage(configSheet);
+        }
+
+        public MeridianVariableEntryPage GotoAccountDetailEntryPage(ISheet configSheet)
+        {
+            //wait general report link exists
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='General Reporting']")));
+
+            //click on general report link
+            GeneralReportLink.Click();
+            //wait purchasing link exists
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='Accounts Payable']")));
+            //click on the Purchasing link
+            AccountPayableLink.Click();
+            //wait PO detail link exists
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='Accounting Detail']")));
+            AccountDetailLink.Click();
             return new MeridianVariableEntryPage(configSheet);
         }
     }
