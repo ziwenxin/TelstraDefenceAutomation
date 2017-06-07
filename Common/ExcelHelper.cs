@@ -18,8 +18,18 @@ namespace Common
         {
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
-                XSSFWorkbook hssfWb = new XSSFWorkbook(fs);
-                return hssfWb.GetSheetAt(0);
+                try
+                {
+                    XSSFWorkbook xssfWb = new XSSFWorkbook(fs);
+                    return xssfWb.GetSheetAt(0);
+
+                }
+                catch (Exception e)
+                {
+                    HSSFWorkbook hssfWb=new HSSFWorkbook(fs);
+                    return hssfWb.GetSheetAt(0);
+                }
+
             }
         }
 
@@ -40,8 +50,19 @@ namespace Common
         //save a excel
         public static void SaveTo(ISheet sheet, string path, int linesToBeDeleted)
         {
+            //delete v2 if the filename contains
+            string lowerPath = path.ToLower();
+            if (lowerPath.Contains("v2"))
+            {
+                //find the index of v2
+                int index = lowerPath.IndexOf("v2");
+                //remove it
+                path = path.Substring(0, index - 1) + path.Substring(index + 2, path.Length - index - 2);
+            }
+
             using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
             {
+
                 //create a new work book with the same sheet name
                 XSSFWorkbook saveWorkbook = new XSSFWorkbook();
                 saveWorkbook.CreateSheet(sheet.SheetName);
@@ -64,6 +85,7 @@ namespace Common
 
                 saveWorkbook.Write(fs);
             }
+
         }
 
         private static void CopyRow(IRow newRow, IRow srcRow)

@@ -74,9 +74,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MERIDIAN\MeridianAccDetailFilterWindow.cs" />
     <Compile Include="MERIDIAN\MeridianCenterPage.cs" />
     <Compile Include="MERIDIAN\MeridianNavigationPage.cs" />
-    <Compile Include="MERIDIAN\MeridianPOAccountDetailPage.cs" />
+    <Compile Include="MERIDIAN\MeridianAccountDetailPage.cs" />
     <Compile Include="MERIDIAN\MeridianPopUpWindow.cs" />
     <Compile Include="MERIDIAN\MeridianVariableEntryPage.cs" />
     <Compile Include="MERIDIAN\MeridianPortalPage.cs" />

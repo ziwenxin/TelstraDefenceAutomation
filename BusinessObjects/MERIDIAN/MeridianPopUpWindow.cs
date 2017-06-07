@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
@@ -37,6 +38,8 @@ namespace BusinessObjects.MERIDIAN
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("LOAD_state_tigen4_tlv1_list_unid27_tv")));
             //select the span
             PODetailSpan.Click();
+            //wait for a while
+            Thread.Sleep(1000);
             //click OK Button
             clickOkBtn();
         }
@@ -48,6 +51,8 @@ namespace BusinessObjects.MERIDIAN
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("LOAD_state_tigen4_tlv1_list_unid7_tv")));
             //select the span
             AccountDetailSpan.Click();
+            //wait for a while
+            Thread.Sleep(1000);
             //click OK Button
             clickOkBtn();
         }

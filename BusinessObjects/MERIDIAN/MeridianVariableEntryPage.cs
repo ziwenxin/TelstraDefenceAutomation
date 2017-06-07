@@ -43,7 +43,7 @@ namespace BusinessObjects.MERIDIAN
 
         }
 
-        private MeridianPOAccountDetailPage EnterVarible(IWebElement inputField,IWebElement inputframe,string inputId,string frameId)
+        private MeridianAccountDetailPage EnterVarible(IWebElement inputField,IWebElement inputframe,string inputId,string frameId)
         {
             //switch to certain frame
             SwitchToFrame("isolatedWorkArea", frameId, inputframe);
@@ -61,7 +61,7 @@ namespace BusinessObjects.MERIDIAN
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("DLG_VARIABLE_dlgBase_BTNOK")));
             OKBtn.Click();
             WaitForLoading();
-            return new MeridianPOAccountDetailPage();
+            return new MeridianAccountDetailPage();
         }
 
         private void SwitchToFrame(string frameId1,string frameId2,IWebElement frame2)
@@ -78,13 +78,13 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().Frame(frame2);
         }
 
-        public MeridianPOAccountDetailPage AccountEnter()
+        public MeridianAccountDetailPage AccountEnter()
         {
             return EnterVarible(AccountTelProfitCenterField, AccountDetailInputFrame, "DLG_VARIABLE_vsc_cvl_VAR_2_INPUT_inp",
                 "iframe_Roundtrip_9223372036154767051");
         }
 
-        public MeridianPOAccountDetailPage PODetailEnter()
+        public MeridianAccountDetailPage PODetailEnter()
         {
             return EnterVarible(POTelProfitCenterField, PODetailInputFrame, "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp",
                 "iframe_Roundtrip_9223372034830153341");

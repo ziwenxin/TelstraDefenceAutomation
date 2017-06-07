@@ -28,12 +28,12 @@ namespace TelstraDefenceAutomation
                 ISheet configSheet = Intialization();
 
                 //before automation, delete all files in the save folder
-                DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
+                //DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                //DownLoadTollDocuments(configSheet);
                 DownLoadMeridianDocuments(configSheet);
+                //DownLoadTollDocuments(configSheet);
 
-                ////delete several lines at the beginning
+                //delete several lines at the beginning
                 //ProcessExcels(configSheet);
             }
             catch (Exception e)
@@ -60,22 +60,28 @@ namespace TelstraDefenceAutomation
             try
             {
                 int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-                for (int i = 0; i < totalReportNum; i++)
+                for (int i = 3; i < totalReportNum; i++)
                 {
                     //read from report
                     string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
                     string filename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
                     string filepath = savePath + filename;
                     //wait until file exists
-                    while (!File.Exists(filepath + ".xlsx"))
+                    string extension = ".xlsx";
+                    while (!File.Exists(filepath + extension))
                     {
+                        if (File.Exists(filepath + ".xls"))
+                        {
+                            extension = ".xls";
+                            break;
+                        }
                         Thread.Sleep(500);
                         totalWaitMilliSecs += 500;
                         if(totalWaitMilliSecs>20000)
                             throw new Exception( filename+" is not downloaded");
                     }
                     int linesToBeDeleted = (int)configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
-                    ISheet reportsheet = ExcelHelper.ReadExcel(filepath + ".xlsx");
+                    ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
 
                     //do the archive
                     MoveFileToArchive(savePath, filename);
@@ -187,26 +193,36 @@ namespace TelstraDefenceAutomation
         {
             Console.WriteLine("Downloading Meridian documents...");
             //go to the portal of meridian
-            MeridianPortalPage meridianPortalPage=new MeridianPortalPage(configSheet);
+            MeridianPortalPage meridianPortalPage = new MeridianPortalPage(configSheet);
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
-            //go to PO detail
-            //MeridianVariableEntryPage meridianVariableEntryPage=meridianNavigationPage.GotoPoDetailEntryPage(configSheet);
-            //MeridianPOAccountDetailPage meridianPoAccountDetailPage=meridianVariableEntryPage.EnterVarible();
-            ////click open button select detail
-            //MeridianPopUpWindow meridianPopUpWindow = meridianPoAccountDetailPage.OpenPoPUpWindow();
-            //meridianPopUpWindow.SelectPODetailDoc();
-            ////download PO Detail Reprrt
-            //meridianPoAccountDetailPage.DownLoadPoDetailDoc();
-            //Console.WriteLine("Po Detail download completed");
+            //DownLoadPODetailDoc(configSheet, meridianNavigationPage);
 
+            DownLoadAccDetailDoc(configSheet, meridianNavigationPage);
+        }
+
+        private static void DownLoadAccDetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
+        {
             //go to account payable entry detail page
-            MeridianVariableEntryPage meridianVariableEntryPage = meridianNavigationPage.GotoAccountDetailEntryPage(configSheet);
-            MeridianPOAccountDetailPage meridianPoAccountDetailPage = meridianVariableEntryPage.AccountEnter();
+            MeridianVariableEntryPage accVariableEntryPage = meridianNavigationPage.GotoAccountDetailEntryPage(configSheet);
+            MeridianAccountDetailPage accountDetailPage = accVariableEntryPage.AccountEnter();
             ////click open button select detail
-            MeridianPopUpWindow meridianPopUpWindow = meridianPoAccountDetailPage.OpenPoPUpWindow();
-            meridianPopUpWindow.SelectAccountDetailDoc();
+            MeridianPopUpWindow accPopUpWindow = accountDetailPage.OpenPoPUpWindow();
+            accPopUpWindow.SelectAccountDetailDoc();
             ////download PO Detail Reprrt
-            meridianPoAccountDetailPage.DownLoadPoDetailDoc();
+            accountDetailPage.DownLoadAccountDetailDoc();
+            Console.WriteLine("Account Detail download completed");
+        }
+
+        private static void DownLoadPODetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
+        {
+            //go to PO detail
+            MeridianVariableEntryPage POVariableEntryPage = meridianNavigationPage.GotoPoDetailEntryPage(configSheet);
+            MeridianAccountDetailPage PoAccountDetailPage = POVariableEntryPage.PODetailEnter();
+            //click open button select detail
+            MeridianPopUpWindow POPopUpWindow = PoAccountDetailPage.OpenPoPUpWindow();
+            POPopUpWindow.SelectPODetailDoc();
+            //download PO Detail Reprrt
+            PoAccountDetailPage.DownLoadPoDetailDoc();
             Console.WriteLine("Po Detail download completed");
         }
 

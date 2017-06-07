@@ -12,7 +12,7 @@ using PropertyCollection;
 
 namespace BusinessObjects.MERIDIAN
 {
-    public class MeridianPOAccountDetailPage : MeridianCenterPage
+    public class MeridianAccountDetailPage : MeridianCenterPage
     {
         [FindsBy(How = How.Id, Using = "BUTTON_OPEN_SAVE_btn1_acButton")]
         public IWebElement OpenBtn { get; set; }
@@ -20,11 +20,11 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id, Using = "BUTTON_TOOLBAR_2_btn3_acButton")]
         public IWebElement SaveBtn { get; set; }
 
-        [FindsBy(How = How.Id, Using = "FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox-r")]
-        public IWebElement InvoiceDateFilterField { get; set; }
+        [FindsBy(How = How.Id, Using = "FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")]
+        public IWebElement InvoiceDateFilterDpList { get; set; }
 
 
-        public MeridianPOAccountDetailPage()
+        public MeridianAccountDetailPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
@@ -32,7 +32,7 @@ namespace BusinessObjects.MERIDIAN
         public MeridianPopUpWindow OpenPoPUpWindow()
         {
             //wait for open button appears
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(20));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("BUTTON_OPEN_SAVE_btn1_acButton")));
             //click it
             OpenBtn.Click();
@@ -53,7 +53,7 @@ namespace BusinessObjects.MERIDIAN
         {
 
             //wait loading image disappears
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(180));
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.XPath("//img[@src='/com.sap.ip.bi.web.portal.mimes/base/images/generic/pixel.gif?version=AyqckNPrka7NCmWJEfbIYw%3D%3D']")));
 
 
@@ -64,20 +64,23 @@ namespace BusinessObjects.MERIDIAN
         {
             //wait drop list clickable
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
-            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("LOAD_state_tigen4_tlv1_list_unid7_tv")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")));
 
             //get current date
             string nowStr = DateTime.Today.ToString("d").Replace("/", ".");
             //replace the last 3 digit by ...
-            nowStr = nowStr.Substring(0, nowStr.Length - 4) + "...";
+            nowStr = nowStr.Substring(0, nowStr.Length - 3) + "...";
             //get the date 3 month ago
-            string threeMonthAgoStr = DateTime.Today.AddMonths(-3).ToString("d").Replace("/", ".");
-            //connect them together, like "1.1.2017 - 1.4.2017";
+            string threeMonthAgoStr = DateTime.Today.AddMonths(-3).ToString("dd").Replace("/", ".");
+            //connect them together, like "01.01.2017 - 01.04.2017";
             string filterStr = threeMonthAgoStr + " - " + nowStr;
             //set the filter
-            WebDriver.ChromeDriver.ExecuteJavaScript("document.getElementById('FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox').setAttribute('value','" + filterStr + "')");
+            //WebDriver.ChromeDriver.ExecuteJavaScript("document.getElementById('FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox').setAttribute('value','" + filterStr + "')");
 
-
+            //click the filter, press 'E' then press 'Enter'
+            InvoiceDateFilterDpList.Click();
+            InvoiceDateFilterDpList.SendKeys("e");
+            InvoiceDateFilterDpList.SendKeys(Keys.Enter);
         }
 
         public void DownLoadPoDetailDoc()
