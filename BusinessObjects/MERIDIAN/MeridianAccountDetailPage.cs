@@ -53,34 +53,38 @@ namespace BusinessObjects.MERIDIAN
         {
 
             //wait loading image disappears
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(180));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(300));
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.XPath("//img[@src='/com.sap.ip.bi.web.portal.mimes/base/images/generic/pixel.gif?version=AyqckNPrka7NCmWJEfbIYw%3D%3D']")));
 
 
         }
 
 
-        public void AddFilter()
+        public MeridianAccDetailFilterWindow AddFilter()
         {
             //wait drop list clickable
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")));
 
-            //get current date
-            string nowStr = DateTime.Today.ToString("d").Replace("/", ".");
-            //replace the last 3 digit by ...
-            nowStr = nowStr.Substring(0, nowStr.Length - 3) + "...";
-            //get the date 3 month ago
-            string threeMonthAgoStr = DateTime.Today.AddMonths(-3).ToString("dd").Replace("/", ".");
-            //connect them together, like "01.01.2017 - 01.04.2017";
-            string filterStr = threeMonthAgoStr + " - " + nowStr;
-            //set the filter
-            //WebDriver.ChromeDriver.ExecuteJavaScript("document.getElementById('FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox').setAttribute('value','" + filterStr + "')");
 
+            //set the filter
             //click the filter, press 'E' then press 'Enter'
             InvoiceDateFilterDpList.Click();
+            //wait for 0.5 sec between each key press
+            Thread.Sleep(500);
             InvoiceDateFilterDpList.SendKeys("e");
+            Thread.Sleep(500);
             InvoiceDateFilterDpList.SendKeys(Keys.Enter);
+
+
+            //wait for pop up window appears, the id is its body
+            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
+            //wait for inner frame         
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("urPopupInner0")));
+            WebDriver.ChromeDriver.SwitchTo().Frame(PopUpFrame);
+            //wait for the pop up window completed
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("SELECTOR_mainctrl_removeButton")));
+            return new MeridianAccDetailFilterWindow();
         }
 
         public void DownLoadPoDetailDoc()
@@ -110,7 +114,15 @@ namespace BusinessObjects.MERIDIAN
             //wait for loading
             WaitForLoading();
             //save the report
-            AddFilter();
+            MeridianAccDetailFilterWindow meridianAccDetailFilterWindow = AddFilter();
+            meridianAccDetailFilterWindow.AddFilter();
+            //switch back 
+            //wait generation of the report
+            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
+            WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
+            WebDriver.ChromeDriver.SwitchTo().Frame(AccountDetailInputFrame);
+            WaitForLoading();
+
             SaveBtn.Click();
             //wait downloading of the report
             WaitForLoading();

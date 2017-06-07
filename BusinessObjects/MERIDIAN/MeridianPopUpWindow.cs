@@ -19,11 +19,7 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id, Using = "LOAD_state_tigen4_tlv1_list_unid7_tv")]
         public IWebElement AccountDetailSpan { get; set; }
 
-        [FindsBy(How = How.Id,Using = "BUTTON_0")]
-        public IWebElement OKBtn { get; set; }
 
-        [FindsBy(How = How.Id, Using = "urPopupOuter0")]
-        public IWebElement OutterFrame { get; set; }
 
         public MeridianPopUpWindow()
         {
@@ -57,11 +53,6 @@ namespace BusinessObjects.MERIDIAN
             clickOkBtn();
         }
 
-        public void clickOkBtn()
-        {
-            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
-            WebDriver.ChromeDriver.SwitchTo().Frame(OutterFrame);
-            OKBtn.Click();
-        }
+
     }
 }

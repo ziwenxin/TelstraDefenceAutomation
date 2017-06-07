@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Excel;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -20,6 +21,8 @@ namespace Common
             {
                 try
                 {
+                    Application excel=new application();
+                    Workbook wb = excel.Workbooks.Open(filepath);
                     XSSFWorkbook xssfWb = new XSSFWorkbook(fs);
                     return xssfWb.GetSheetAt(0);
 

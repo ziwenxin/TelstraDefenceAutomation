@@ -16,12 +16,15 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using PropertyCollection;
 
+
+
 namespace TelstraDefenceAutomation
 {
     public class MainProcess
     {
         static void Main(string[] args)
         {
+            
             try
             {
                 //read settings and set default download folder for chrome
@@ -30,11 +33,11 @@ namespace TelstraDefenceAutomation
                 //before automation, delete all files in the save folder
                 //DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                DownLoadMeridianDocuments(configSheet);
+                //DownLoadMeridianDocuments(configSheet);
                 //DownLoadTollDocuments(configSheet);
 
                 //delete several lines at the beginning
-                //ProcessExcels(configSheet);
+                ProcessExcels(configSheet);
             }
             catch (Exception e)
             {
@@ -60,7 +63,7 @@ namespace TelstraDefenceAutomation
             try
             {
                 int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-                for (int i = 3; i < totalReportNum; i++)
+                for (int i = 0; i < totalReportNum; i++)
                 {
                     //read from report
                     string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;

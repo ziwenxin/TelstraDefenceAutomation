@@ -23,9 +23,22 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id, Using = "iframe_Roundtrip_9223372036154767051")]
         public IWebElement AccountDetailInputFrame { get; set; }
 
+        [FindsBy(How = How.Id, Using = "BUTTON_0")]
+        public IWebElement OKBtn { get; set; }
+
+        [FindsBy(How = How.Id, Using = "urPopupOuter0")]
+        public IWebElement OutterFrame { get; set; }
+
         public MeridianCenterPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver,this);
+        }
+
+        public void clickOkBtn()
+        {
+            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
+            WebDriver.ChromeDriver.SwitchTo().Frame(OutterFrame);
+            OKBtn.Click();
         }
     }
 }
