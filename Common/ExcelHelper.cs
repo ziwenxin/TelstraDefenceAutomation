@@ -19,19 +19,10 @@ namespace Common
         {
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             {
-                try
-                {
-                    Application excel=new application();
-                    Workbook wb = excel.Workbooks.Open(filepath);
-                    XSSFWorkbook xssfWb = new XSSFWorkbook(fs);
-                    return xssfWb.GetSheetAt(0);
+                XSSFWorkbook xssfWb = new XSSFWorkbook(fs);
+                return xssfWb.GetSheetAt(0);
 
-                }
-                catch (Exception e)
-                {
-                    HSSFWorkbook hssfWb=new HSSFWorkbook(fs);
-                    return hssfWb.GetSheetAt(0);
-                }
+
 
             }
         }
@@ -140,6 +131,72 @@ namespace Common
             else
             { // nothing29
             }
+        }
+
+        //process excel file with invalid header
+        public static void ProcessInvalidExcel(string path, string filename)
+        {
+            //read all the lines
+            int tableTagCount = 0;
+            string[] allLines = File.ReadAllLines(path + filename + ".xls");
+            //transfer the array to a list
+            List<string> strList = new List<string>(allLines);
+            for (int i = 0; i < strList.Count; i++)
+            {
+                string line = strList[i];
+                //delete the image
+                if (line.Contains("<table>") && tableTagCount == 0)
+                {
+                    //delete the belowing 5 lines
+                    for (int j = 0; j < 2; j++)
+                    {
+                        strList.RemoveAt(i+j);
+
+                    }
+                    tableTagCount++;
+                }
+                //delete the line above content
+                else if (line.Contains("<table>"))
+                {
+                    //find the last idx of "<table>"
+                    int lastIdx = line.LastIndexOf("<table>");
+                    //remove all the text before it
+                    strList[i] = strList[i].Substring(lastIdx - "<table>".Length + "<table>".Length);
+                    break;
+                }
+            }
+            //make an archive
+            MoveFileToArchive(path, filename, ".xls");
+            //save the text into a new file
+            File.WriteAllLines(path + filename + ".xls", strList.ToArray());
+
+        }
+
+
+        public static void MoveFileToArchive(string savePath, string filename, string extension)
+        {
+            //save set archivepath and archive file name
+            string archivePath = savePath + "Archive/";
+            if (!Directory.Exists(archivePath))
+                Directory.CreateDirectory(archivePath);
+            //set date format
+            string dateStr = DateTime.Today.ToString("d");
+            dateStr = dateStr.Replace("/", "-");
+            //set a data folder in the archive folder
+            archivePath += dateStr + "/";
+            if (!Directory.Exists(archivePath))
+                Directory.CreateDirectory(archivePath);
+            string archiveFilename = filename + " " + dateStr;
+            //set destination path and original path
+            string OriginalPath = savePath + filename + extension;
+            string dstPath = archivePath + archiveFilename + extension;
+            //if the archive file exists, delete it
+            if (File.Exists(dstPath))
+                File.Delete(dstPath);
+            //copy the file to archive folder
+            File.Copy(OriginalPath, dstPath);
+            //delete the original file
+            File.Delete(OriginalPath);
         }
     }
 }

@@ -9,6 +9,7 @@ using BusinessObjects;
 using BusinessObjects.MERIDIAN;
 using Common;
 using Exceptions;
+using ICSharpCode.SharpZipLib.Tar;
 using NPOI.SS.Formula.PTG;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -63,7 +64,7 @@ namespace TelstraDefenceAutomation
             try
             {
                 int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-                for (int i = 0; i < totalReportNum; i++)
+                for (int i = 3; i < totalReportNum; i++)
                 {
                     //read from report
                     string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
@@ -83,13 +84,23 @@ namespace TelstraDefenceAutomation
                         if(totalWaitMilliSecs>20000)
                             throw new Exception( filename+" is not downloaded");
                     }
-                    int linesToBeDeleted = (int)configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
-                    ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
+                    int linesToBeDeleted = (int) configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
 
-                    //do the archive
-                    MoveFileToArchive(savePath, filename);
-                    //save
-                    ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
+                    //use library to read an excel file
+                    try
+                    {
+                        ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
+
+                        //do the archive
+                        ExcelHelper.MoveFileToArchive(savePath, filename,".xlsx");
+                        //save
+                        ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
+                    }
+                    catch (Exception e)
+                    {
+                        //process the file by string
+                        ExcelHelper.ProcessInvalidExcel(savePath,filename);
+                    }
                     Console.WriteLine(filename+" process completed");
                 }
 
@@ -229,31 +240,6 @@ namespace TelstraDefenceAutomation
             Console.WriteLine("Po Detail download completed");
         }
 
-        private static void MoveFileToArchive(string savePath, string filename)
-        {
-            //save set archivepath and archive file name
-            string archivePath = savePath + "Archive/";
-            if (!Directory.Exists(archivePath))
-                Directory.CreateDirectory(archivePath);
-            //set date format
-            string dateStr = DateTime.Today.ToString("d");
-            dateStr = dateStr.Replace("/", "-");
-            //set a data folder in the archive folder
-            archivePath += dateStr + "/";
-            if (!Directory.Exists(archivePath))
-                Directory.CreateDirectory(archivePath);
-            string archiveFilename = filename + " " + dateStr;
-            //set destination path and original path
-            string OriginalPath = savePath + filename + ".xlsx";
-            string dstPath = archivePath + archiveFilename + ".xlsx";
-            //if the archive file exists, delete it
-            if (File.Exists(dstPath))
-                File.Delete(dstPath);
-            //copy the file to archive folder
-            File.Copy(OriginalPath, dstPath);
-            //delete the original file
-            File.Delete(OriginalPath);
-        }
 
         private static void Exit()
         {
