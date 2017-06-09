@@ -25,17 +25,18 @@ namespace TelstraDefenceAutomation
     {
         static void Main(string[] args)
         {
-            
+
             try
             {
                 //read settings and set default download folder for chrome
                 ISheet configSheet = Intialization();
 
                 //before automation, delete all files in the save folder
-                //DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
+                DeleteAllFiles(configSheet.GetRow(4).GetCell(1).StringCellValue);
 
-                //DownLoadMeridianDocuments(configSheet);
-                //DownLoadTollDocuments(configSheet);
+                //download excel files
+                DownLoadTollDocuments(configSheet);
+                DownLoadMeridianDocuments(configSheet);
 
                 //delete several lines at the beginning
                 ProcessExcels(configSheet);
@@ -61,55 +62,41 @@ namespace TelstraDefenceAutomation
             Console.WriteLine("Processing Excel files...");
             int totalWaitMilliSecs = 0;
             //get total report numbers
-            try
+            int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
+            for (int i = 0; i < totalReportNum; i++)
             {
-                int totalReportNum = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
-                for (int i = 3; i < totalReportNum; i++)
+                //read from report
+                string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
+                string filename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
+                string filepath = savePath + filename;
+                //check if the file exists
+                string extension = ".xlsx";
+
+                if (!File.Exists(filepath + extension))
                 {
-                    //read from report
-                    string savePath = configSheet.GetRow(4).GetCell(1).StringCellValue;
-                    string filename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
-                    string filepath = savePath + filename;
-                    //wait until file exists
-                    string extension = ".xlsx";
-                    while (!File.Exists(filepath + extension))
-                    {
-                        if (File.Exists(filepath + ".xls"))
-                        {
-                            extension = ".xls";
-                            break;
-                        }
-                        Thread.Sleep(500);
-                        totalWaitMilliSecs += 500;
-                        if(totalWaitMilliSecs>20000)
-                            throw new Exception( filename+" is not downloaded");
-                    }
-                    int linesToBeDeleted = (int) configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
-
-                    //use library to read an excel file
-                    try
-                    {
-                        ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
-
-                        //do the archive
-                        ExcelHelper.MoveFileToArchive(savePath, filename,".xlsx");
-                        //save
-                        ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
-                    }
-                    catch (Exception e)
-                    {
-                        //process the file by string
-                        ExcelHelper.ProcessInvalidExcel(savePath,filename);
-                    }
-                    Console.WriteLine(filename+" process completed");
+                    if (!File.Exists(filepath + ".xls"))
+                        throw new Exception(filepath + " is not downloaded");
                 }
+                int linesToBeDeleted = (int)configSheet.GetRow(7).GetCell(1 + i).NumericCellValue;
 
+                //use library to read an excel file
+                try
+                {
+                    ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
+
+                    //do the archive
+                    ExcelHelper.MoveFileToArchive(savePath, filename, ".xlsx");
+                    //save
+                    ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
+                }
+                catch (Exception e)
+                {
+                    //process the file by string
+                    ExcelHelper.ProcessInvalidExcel(savePath, filename);
+                }
+                Console.WriteLine(filename + " process completed");
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                Exit();
-            }
+
 
 
         }
@@ -118,7 +105,7 @@ namespace TelstraDefenceAutomation
         private static void DeleteAllFiles(string path)
         {
             Console.WriteLine("Deleting all previous files...");
-            DirectoryInfo di=new DirectoryInfo(path);
+            DirectoryInfo di = new DirectoryInfo(path);
             foreach (FileInfo fileInfo in di.GetFiles())
             {
                 fileInfo.Delete();
@@ -150,12 +137,11 @@ namespace TelstraDefenceAutomation
                 catch (Exception e)
                 {
                     //close the previous window
-                    if(WebDriver.ChromeDriver!=null)
+                    if (WebDriver.ChromeDriver != null)
                         WebDriver.ChromeDriver.Quit();
                     if (retryCount <= 0)
                     {
-                        Console.WriteLine(e.Message);
-                        Exit();
+                        throw e;
                     }
                     retryCount--;
                 }
@@ -172,32 +158,36 @@ namespace TelstraDefenceAutomation
             {
                 TollLoginPage tollLoginPage = new TollLoginPage(configSheet);
                 TollReportDownloadPage tollDownloadPage = tollLoginPage.Login();
+                string savepath = configSheet.GetRow(4).GetCell(1).StringCellValue;
                 //download first document
+                string filename = configSheet.GetRow(6).GetCell(1).StringCellValue;
                 TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
-                tollGoodReportPage.DownLoadReport();
-                Console.WriteLine("TelDef - Goods Receipt By Date Range download completed");
+                tollGoodReportPage.DownLoadReport(savepath + filename);
+                Console.WriteLine(filename + " download completed");
                 //download 2nd
+                filename = configSheet.GetRow(6).GetCell(2).StringCellValue;
                 tollDownloadPage.GoToReportPage();
                 TollShipOrderPage tollShipDetailPage = tollDownloadPage.DownLoadShipOrder();
-                tollShipDetailPage.DownLoadReport();
-                Console.WriteLine("TelDef - Shipped Order Report download completed");
+                tollShipDetailPage.DownLoadReport(savepath + filename);
+
+                Console.WriteLine(filename + "download completed");
 
                 //download the 3rd 
+                filename = configSheet.GetRow(6).GetCell(3).StringCellValue;
                 tollDownloadPage.GoToReportPage();
                 TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
-                tollSohDetailPage.DownLoadReport();
-                Console.WriteLine("TelDef - SOH Detail Report download completed");
+                tollSohDetailPage.DownLoadReport(savepath + filename);
+                Console.WriteLine(filename + "download completed");
 
             }
             catch (NoReportsException reportsException)
             {
                 Console.WriteLine("The 'TollTotalDocuments' cell could not be emtry");
-                Exit();
+                throw reportsException;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                Exit();
+                throw e;
 
             }
 
@@ -209,8 +199,9 @@ namespace TelstraDefenceAutomation
             //go to the portal of meridian
             MeridianPortalPage meridianPortalPage = new MeridianPortalPage(configSheet);
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
-            //DownLoadPODetailDoc(configSheet, meridianNavigationPage);
 
+            //download files
+            DownLoadPODetailDoc(configSheet, meridianNavigationPage);
             DownLoadAccDetailDoc(configSheet, meridianNavigationPage);
         }
 
@@ -222,8 +213,11 @@ namespace TelstraDefenceAutomation
             ////click open button select detail
             MeridianPopUpWindow accPopUpWindow = accountDetailPage.OpenPoPUpWindow();
             accPopUpWindow.SelectAccountDetailDoc();
+            //get full path
+            string filename = configSheet.GetRow(6).GetCell(5).StringCellValue;
+            string savepath = configSheet.GetRow(4).GetCell(1).StringCellValue;
             ////download PO Detail Reprrt
-            accountDetailPage.DownLoadAccountDetailDoc();
+            accountDetailPage.DownLoadAccountDetailDoc(savepath + filename);
             Console.WriteLine("Account Detail download completed");
         }
 
@@ -235,11 +229,18 @@ namespace TelstraDefenceAutomation
             //click open button select detail
             MeridianPopUpWindow POPopUpWindow = PoAccountDetailPage.OpenPoPUpWindow();
             POPopUpWindow.SelectPODetailDoc();
+            //get full path
+            string filename = configSheet.GetRow(6).GetCell(4).StringCellValue;
+            string savepath = configSheet.GetRow(4).GetCell(1).StringCellValue;
             //download PO Detail Reprrt
-            PoAccountDetailPage.DownLoadPoDetailDoc();
-            Console.WriteLine("Po Detail download completed");
+            PoAccountDetailPage.DownLoadPoDetailDoc(savepath + filename);
+            Console.WriteLine(filename + " download completed");
         }
 
+        public static void RescheduleTask()
+        {
+            
+        }
 
         private static void Exit()
         {

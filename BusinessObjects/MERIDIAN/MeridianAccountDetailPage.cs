@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -32,7 +33,7 @@ namespace BusinessObjects.MERIDIAN
         public MeridianPopUpWindow OpenPoPUpWindow()
         {
             //wait for open button appears
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(20));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(300));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("BUTTON_OPEN_SAVE_btn1_acButton")));
             //click it
             OpenBtn.Click();
@@ -53,7 +54,7 @@ namespace BusinessObjects.MERIDIAN
         {
 
             //wait loading image disappears
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(300));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(600));
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.XPath("//img[@src='/com.sap.ip.bi.web.portal.mimes/base/images/generic/pixel.gif?version=AyqckNPrka7NCmWJEfbIYw%3D%3D']")));
 
 
@@ -87,7 +88,7 @@ namespace BusinessObjects.MERIDIAN
             return new MeridianAccDetailFilterWindow();
         }
 
-        public void DownLoadPoDetailDoc()
+        public void DownLoadPoDetailDoc(string fullpath)
         {
             //wait generation of the report
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
@@ -95,17 +96,18 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().Frame(PODetailInputFrame);
             //wait for loading
             WaitForLoading();
-            //save the report
-            SaveBtn.Click();
-            //wait downloading of the report
-            WaitForLoading();
+
+
+            //dowloading the file
+            RetryDownloading(fullpath);
+
             //change the frame to default
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
 
         }
 
 
-        public void DownLoadAccountDetailDoc()
+        public void DownLoadAccountDetailDoc(string fullpath)
         {
             //wait generation of the report
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
@@ -113,6 +115,7 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().Frame(AccountDetailInputFrame);
             //wait for loading
             WaitForLoading();
+
             //save the report
             MeridianAccDetailFilterWindow meridianAccDetailFilterWindow = AddFilter();
             meridianAccDetailFilterWindow.AddFilter();
@@ -121,14 +124,50 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             WebDriver.ChromeDriver.SwitchTo().Frame(AccountDetailInputFrame);
-            WaitForLoading();
 
-            SaveBtn.Click();
-            //wait downloading of the report
-            WaitForLoading();
+                WaitForLoading();
+ 
+
+            //download the file
+            RetryDownloading(fullpath);
+
             //change the frame to default
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
 
+        }
+
+        public void RetryDownloading(string fullpath)
+        {
+            //retry downloading
+            int retryCount = 3;
+            while (retryCount > 0)
+            {
+                //save the report
+                SaveBtn.Click();
+                //wait downloading of the report
+                try
+                {
+                    WaitForLoading();
+                }
+                catch (Exception)
+                {
+                }
+                int totalTime = 60000; //60 sec
+                bool isFileExists = false;
+                //wait for downloading
+                while (!(isFileExists = File.Exists(fullpath + ".xls")))
+                {
+                    //if the file does not exitst after downloading
+                    //retry it
+                    if (totalTime <= 0)
+                        break;
+                    Thread.Sleep(1000);
+                    totalTime -= 1000;
+                }
+                if (isFileExists)
+                    break;
+                retryCount--;
+            }
         }
     }
 }

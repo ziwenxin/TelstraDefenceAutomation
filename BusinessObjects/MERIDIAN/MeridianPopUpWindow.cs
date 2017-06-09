@@ -43,7 +43,7 @@ namespace BusinessObjects.MERIDIAN
         public void SelectAccountDetailDoc()
         {
             //wait the span valid
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("LOAD_state_tigen4_tlv1_list_unid7_tv")));
             //select the span
             AccountDetailSpan.Click();

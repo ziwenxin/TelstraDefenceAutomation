@@ -37,7 +37,7 @@ namespace BusinessObjects.MERIDIAN
         public void WaitForLoading()
         {
             //WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(300));
             //wait for the telstra img appears
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("QUERY_TITLE_TextItem")));
 
@@ -48,7 +48,7 @@ namespace BusinessObjects.MERIDIAN
             //switch to certain frame
             SwitchToFrame("isolatedWorkArea", frameId, inputframe);
 
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(600));
 
 
             //get code from config file
@@ -68,7 +68,7 @@ namespace BusinessObjects.MERIDIAN
         {
             //switch to correct frame
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(60));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
 
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id(frameId1)));
             //switch to sub frame

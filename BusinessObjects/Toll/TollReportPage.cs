@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -24,7 +25,7 @@ namespace BusinessObjects
 
         public virtual void AddFilter() { }
 
-        public void DownLoadReport()
+        public void DownLoadReport(string fullpath)
         {
             IWebDriver driver = WebDriver.ChromeDriver;
             //wait for the page loaded
@@ -38,8 +39,36 @@ namespace BusinessObjects
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("ReportViewer1_AsyncWait_Wait")));
             //wait until the loading finish
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));
-            SaveIcon.Click();
-            ExcelSaveLink.Click();
+            //retry downloading
+            RetryDownload(fullpath);
+        }
+
+        public void RetryDownload(string fullpath)
+        {
+            //retry downloading
+            int retryCount = 3;
+            while (retryCount > 0)
+            {
+                //click the save link
+                SaveIcon.Click();
+                ExcelSaveLink.Click();
+                int totalTime = 60000; //60 sec
+                bool isFileExists = false;
+                //wait for downloading
+                while (!(isFileExists = File.Exists(fullpath + ".xlsx")))
+                {
+                    //if the file does not exitst after downloading
+                    //retry it
+                    if (totalTime <= 0)
+                        break;
+                    Thread.Sleep(1000);
+                    totalTime -= 1000;
+                }
+                if (isFileExists)
+                    break;
+                retryCount--;
+            }
+
         }
 
     }

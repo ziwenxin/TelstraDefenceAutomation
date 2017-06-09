@@ -44,22 +44,14 @@ namespace Common
         //save a excel
         public static void SaveTo(ISheet sheet, string path, int linesToBeDeleted)
         {
-            //delete v2 if the filename contains
-            string lowerPath = path.ToLower();
-            if (lowerPath.Contains("v2"))
-            {
-                //find the index of v2
-                int index = lowerPath.IndexOf("v2");
-                //remove it
-                path = path.Substring(0, index - 1) + path.Substring(index + 2, path.Length - index - 2);
-            }
+            path = RemoveV2(path);
 
             using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
             {
 
                 //create a new work book with the same sheet name
                 XSSFWorkbook saveWorkbook = new XSSFWorkbook();
-                saveWorkbook.CreateSheet(sheet.SheetName);
+                saveWorkbook.CreateSheet(RemoveV2(sheet.SheetName));
                 ISheet newSheet = saveWorkbook.GetSheetAt(0);
 
                 //copy data row by row
@@ -197,6 +189,20 @@ namespace Common
             File.Copy(OriginalPath, dstPath);
             //delete the original file
             File.Delete(OriginalPath);
+        }
+
+        public static string RemoveV2(string str)
+        {
+            //delete v2 if the filename contains
+            string lowerPath = str.ToLower();
+            if (lowerPath.Contains("v2"))
+            {
+                //find the index of v2
+                int index = lowerPath.IndexOf("v2");
+                //remove it
+                str = str.Substring(0, index - 1) + str.Substring(index + 2, str.Length - index - 2);
+            }
+            return str;
         }
     }
 }
