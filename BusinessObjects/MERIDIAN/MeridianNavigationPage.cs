@@ -36,7 +36,7 @@ namespace BusinessObjects.MERIDIAN
         public MeridianVariableEntryPage GotoPoDetailEntryPage(ISheet configSheet)
         {
             //wait general report link exists
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
             wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='General Reporting']")));
 
             //click on general report link

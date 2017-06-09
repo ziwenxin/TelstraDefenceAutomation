@@ -30,7 +30,7 @@ namespace BusinessObjects.MERIDIAN
         public void SelectPODetailDoc()
         {
             //wait the span valid
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("LOAD_state_tigen4_tlv1_list_unid27_tv")));
             //select the span
             PODetailSpan.Click();

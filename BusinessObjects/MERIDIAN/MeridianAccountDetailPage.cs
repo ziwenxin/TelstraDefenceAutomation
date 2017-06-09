@@ -38,7 +38,6 @@ namespace BusinessObjects.MERIDIAN
             //click it
             OpenBtn.Click();
 
-            //wait for pop up window appears, the id is its body
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             //wait for inner frame         
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("urPopupInner0")));
@@ -64,7 +63,7 @@ namespace BusinessObjects.MERIDIAN
         public MeridianAccDetailFilterWindow AddFilter()
         {
             //wait drop list clickable
-            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
+            WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(300));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")));
 
 
@@ -125,8 +124,8 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             WebDriver.ChromeDriver.SwitchTo().Frame(AccountDetailInputFrame);
 
-                WaitForLoading();
- 
+            WaitForLoading();
+
 
             //download the file
             RetryDownloading(fullpath);
@@ -142,16 +141,14 @@ namespace BusinessObjects.MERIDIAN
             int retryCount = 3;
             while (retryCount > 0)
             {
+                //wait for save btn available
+                WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
+                wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("BUTTON_TOOLBAR_2_btn3_acButton")));
                 //save the report
                 SaveBtn.Click();
                 //wait downloading of the report
-                try
-                {
-                    WaitForLoading();
-                }
-                catch (Exception)
-                {
-                }
+                WaitForLoading();
+
                 int totalTime = 60000; //60 sec
                 bool isFileExists = false;
                 //wait for downloading
