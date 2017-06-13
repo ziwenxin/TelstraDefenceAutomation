@@ -36,7 +36,7 @@ namespace BusinessObjects.MERIDIAN
                 try
                 {
                     //go to launch url
-                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(9).GetCell(1).StringCellValue);
+                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(10).GetCell(1).StringCellValue);
                     //wait for the image appears
                     WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
                     wait.Until(ExpectedConditions.ElementIsVisible(By.Id("2406890")));

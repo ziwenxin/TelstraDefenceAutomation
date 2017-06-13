@@ -52,7 +52,7 @@ namespace BusinessObjects.MERIDIAN
 
 
             //get code from config file
-            string code = ConfigSheet.GetRow(10).GetCell(1).StringCellValue;
+            string code = ConfigSheet.GetRow(11).GetCell(1).StringCellValue;
             //wait for the input field
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id(inputId)));
             //input

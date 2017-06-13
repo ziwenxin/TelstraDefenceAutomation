@@ -36,7 +36,7 @@ namespace BusinessObjects
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
             //find elements with the file names from config file
-            int totalDocuments = (int)configSheet.GetRow(5).GetCell(1).NumericCellValue;
+            int totalDocuments = (int)configSheet.GetRow(6).GetCell(1).NumericCellValue;
             if (totalDocuments <= 0)
                 throw new NoReportsException();
             //swtich to report frame
@@ -63,7 +63,7 @@ namespace BusinessObjects
 
         public void GoToReportPage()
         {
-            WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(3).GetCell(1).StringCellValue);
+            WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(4).GetCell(1).StringCellValue);
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
@@ -73,7 +73,7 @@ namespace BusinessObjects
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(1).StringCellValue + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(7).GetCell(1).StringCellValue + "']")));
             //click the link
             GoodReportLink.Click();
             return new TollGoodReportPage();
@@ -83,7 +83,7 @@ namespace BusinessObjects
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(2).StringCellValue + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(7).GetCell(2).StringCellValue + "']")));
 
             //click the link
             ShipDetailLink.Click();
@@ -94,7 +94,7 @@ namespace BusinessObjects
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(6).GetCell(3).StringCellValue + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(7).GetCell(3).StringCellValue + "']")));
 
             //click on the link
             SOHDetailLink.Click();

@@ -51,7 +51,7 @@ namespace BusinessObjects
             //wait for 2 secs 
             Thread.Sleep(2000);
             //launch the web
-            driver.Navigate().GoToUrl(Configsheet.GetRow(0).GetCell(1).StringCellValue);
+            driver.Navigate().GoToUrl(Configsheet.GetRow(1).GetCell(1).StringCellValue);
 
             //wait until the save icon exists
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
@@ -82,8 +82,8 @@ namespace BusinessObjects
 
 
             //enter the credentials
-            UserNameField.SendKeys(Configsheet.GetRow(1).GetCell(1).StringCellValue);
-            PasswordField.SendKeys(Configsheet.GetRow(2).GetCell(1).StringCellValue);
+            UserNameField.SendKeys(Configsheet.GetRow(2).GetCell(1).StringCellValue);
+            PasswordField.SendKeys(Configsheet.GetRow(3).GetCell(1).StringCellValue);
             //click login
             LoginBtn.Click();
             return new TollReportDownloadPage(Configsheet);
