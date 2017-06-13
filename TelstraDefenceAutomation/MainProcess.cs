@@ -16,7 +16,7 @@ using NPOI.XSSF.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using PropertyCollection;
-
+using WinSCP;
 
 
 namespace TelstraDefenceAutomation
@@ -40,6 +40,9 @@ namespace TelstraDefenceAutomation
 
                 //delete several lines at the beginning
                 ProcessExcels(configSheet);
+
+                //upload to server
+                UploadFiles(configSheet);
             }
             catch (Exception e)
             {
@@ -49,11 +52,56 @@ namespace TelstraDefenceAutomation
             }
 
 
+
+
             Exit();
 
 
 
 
+
+        }
+
+        private static void UploadFiles(ISheet configSheet)
+        {
+            //setup session options
+            SessionOptions options = new SessionOptions
+            {
+                Protocol = Protocol.Sftp,
+                HostName = configSheet.GetRow(12).GetCell(1).StringCellValue,
+                UserName = configSheet.GetRow(13).GetCell(1).StringCellValue,
+                Password = configSheet.GetRow(14).GetCell(1).StringCellValue,
+                SshHostKeyFingerprint = configSheet.GetRow(15).GetCell(1).StringCellValue,
+            };
+
+            using (Session session = new Session())
+            {
+                //connect
+                session.Open(options);
+
+                //upload files
+                TransferOptions transferOptions = new TransferOptions();
+                transferOptions.TransferMode = TransferMode.Binary;
+
+                //get path
+                string localPath = configSheet.GetRow(4).GetCell(1).StringCellValue;
+                string remotePath = configSheet.GetRow(16).GetCell(1).StringCellValue;
+                //change the '/' to '\'
+                localPath=localPath.Replace("/", "\\");
+
+                //upload the files into server,delete the files in the local
+                TransferOperationResult operationResult =
+                    session.PutFiles(localPath+"*.xls*", remotePath, true, transferOptions);
+
+                //throw any error
+                operationResult.Check();
+
+                //print result
+                foreach (TransferEventArgs transfer in operationResult.Transfers)
+                {
+                    Console.WriteLine("Upload of {0} successed", transfer.FileName);
+                }
+            }
 
         }
 
@@ -239,7 +287,7 @@ namespace TelstraDefenceAutomation
 
         public static void RescheduleTask()
         {
-            
+
         }
 
         private static void Exit()

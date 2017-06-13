@@ -29,7 +29,9 @@ namespace PropertyCollection
             chromeOptions.AddArgument("disable-popup-blocking");
             DesiredCapabilities capabilities = DesiredCapabilities.Chrome();
             capabilities.SetCapability(ChromeOptions.Capability, chromeOptions);
-            ChromeDriver = new ChromeDriver(chromeOptions);
+            //set default timeout to 5 minutes
+            ChromeDriver = new ChromeDriver(".",chromeOptions,new TimeSpan(0,5,0));
+
         }
     }
 }

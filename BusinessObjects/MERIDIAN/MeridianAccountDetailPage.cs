@@ -54,7 +54,7 @@ namespace BusinessObjects.MERIDIAN
 
             //wait loading image disappears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(600));
-            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.XPath("//img[@src='/com.sap.ip.bi.web.portal.mimes/base/images/generic/pixel.gif?version=AyqckNPrka7NCmWJEfbIYw%3D%3D']")));
+            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.XPath("/html/body/div[13]/img")));
 
 
         }
@@ -146,6 +146,7 @@ namespace BusinessObjects.MERIDIAN
                 wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("BUTTON_TOOLBAR_2_btn3_acButton")));
                 //save the report
                 SaveBtn.Click();
+
                 //wait downloading of the report
                 WaitForLoading();
 
