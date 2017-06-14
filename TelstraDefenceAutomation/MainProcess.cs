@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.Remoting.Contexts;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects;
@@ -34,24 +38,29 @@ namespace TelstraDefenceAutomation
                 configSheet = Intialization();
 
                 //before automation, delete all files in the save folder
-                DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
+                //DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
 
-                //download excel files
-                DownLoadTollDocuments();
-                DownLoadMeridianDocuments();
+                ////download excel files
+                //DownLoadTollDocuments();
+                //DownLoadMeridianDocuments();
 
-                //delete several lines at the beginning
-                ProcessExcels();
+                ////delete several lines at the beginning
+                //ProcessExcels();
 
+                //copy files from share folder
+                DownLoadShareFolderDocs();
+
+                //download files from share point
+                DownLoadSharePointDoc();
                 //upload to server
-                UploadFiles();
+                //UploadFiles();
             }
             catch (Exception e)
             {
-                RescheduleTask();
+                //reshedule one run
+                //RescheduleTask();
                 Console.WriteLine(e);
                 Console.WriteLine("\r\n Press Any Key To Exit");
-                //reshedule one run
                 Console.ReadKey();
             }
 
@@ -64,6 +73,48 @@ namespace TelstraDefenceAutomation
 
 
 
+        }
+
+        private static void DownLoadSharePointDoc()
+        {
+            //go to share point page
+            string URL = configSheet.GetRow(31).GetCell(1).StringCellValue;
+            WebDriver.ChromeDriver.Navigate().GoToUrl(URL);
+            //
+            WebDriver.ChromeDriver.FindElement(By.XPath("//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img"));
+
+        }
+
+        private static void DownLoadShareFolderDocs()
+        {
+            //set principal
+            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+
+            //get username and password
+            string username = configSheet.GetRow(22).GetCell(1).StringCellValue;
+            string password = configSheet.GetRow(23).GetCell(1).StringCellValue;
+            //get local save path and server path
+            string localPath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+            string serverPath = configSheet.GetRow(24).GetCell(1).StringCellValue;
+            //get filename
+            string filename = configSheet.GetRow(25).GetCell(1).StringCellValue;
+            //launch a command line to connect to the server
+            connectState(serverPath, username, password);
+
+            //copy logistic schedule file
+            serverPath += "\\";
+            File.Copy(serverPath + filename, localPath + filename, true);
+            //copy Burwood stock transfer file
+            serverPath = configSheet.GetRow(26).GetCell(1).StringCellValue+"\\";
+            filename = configSheet.GetRow(27).GetCell(1).StringCellValue;
+            filename=GetNewestFileName(serverPath,filename);
+            File.Copy(serverPath + filename, localPath + filename, true);
+            //copy Regents transfer stock file
+            //copy Burwood stock transfer file
+            serverPath = configSheet.GetRow(28).GetCell(1).StringCellValue + "\\";
+            filename = configSheet.GetRow(29).GetCell(1).StringCellValue;
+            filename = GetNewestFileName(serverPath, filename);
+            File.Copy(serverPath + filename, localPath + filename, true);
         }
 
         private static void UploadFiles()
@@ -91,11 +142,11 @@ namespace TelstraDefenceAutomation
                 string localPath = configSheet.GetRow(5).GetCell(1).StringCellValue;
                 string remotePath = configSheet.GetRow(17).GetCell(1).StringCellValue;
                 //change the '/' to '\'
-                localPath=localPath.Replace("/", "\\");
+                localPath = localPath.Replace("/", "\\");
 
                 //upload the files into server,delete the files in the local
                 TransferOperationResult operationResult =
-                    session.PutFiles(localPath+"*.xls*", remotePath, true, transferOptions);
+                    session.PutFiles(localPath + "*.xls*", remotePath, true, transferOptions);
 
                 //throw any error
                 operationResult.Check();
@@ -293,7 +344,7 @@ namespace TelstraDefenceAutomation
         public static void RescheduleTask()
         {
             //get the service on the local 
-            using (TaskService ts=new TaskService())
+            using (TaskService ts = new TaskService())
             {
                 //create a new task
                 TaskDefinition td = ts.NewTask();
@@ -325,12 +376,61 @@ namespace TelstraDefenceAutomation
             Console.WriteLine("The automation will be closed in 5 secs");
             //close the automation
             Thread.Sleep(5000);
-            WebDriver.ChromeDriver.Quit();
+            if (WebDriver.ChromeDriver != null)
+                WebDriver.ChromeDriver.Quit();
             Environment.Exit(0);
         }
 
+        private static bool connectState(string path, string username, string password)
+        {
+            //connect result
+            bool flag = false;
+            using (Process proc = new Process())
+            {
 
+                //set parameters
+                proc.StartInfo.FileName = "cmd.exe";
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.RedirectStandardInput = true;
+                proc.StartInfo.RedirectStandardOutput = true;
+                proc.StartInfo.RedirectStandardError = true;
+                proc.StartInfo.CreateNoWindow = true;
+                //start and input
+                proc.Start();
+                string dosLine = @"net use " + path + " /User:" + username + " " + password + " /PERSISTENT:YES";
+                proc.StandardInput.WriteLine(dosLine);
+                //exit
+                proc.StandardInput.WriteLine("exit");
+                //wait for exit
+                while (!proc.HasExited)
+                {
+                    proc.WaitForExit(1000);
+                }
+                //get error messages
+                string errormsg = proc.StandardError.ReadToEnd();
+                proc.StandardError.Close();
+                if (string.IsNullOrEmpty(errormsg))
+                {
+                    flag = true;
+                }
+                else
+                {
+                    throw new Exception(errormsg);
+                }
+            }
+            return flag;
+        }
 
+        private static string GetNewestFileName(string filepath, string filename)
+        {
 
+            //get directory info
+            DirectoryInfo directory = new DirectoryInfo(filepath);
+            //get the latest file
+            return directory.GetFiles(filename+"*.xlsx").OrderByDescending(f=>f.LastWriteTime).First().Name;
+        }
     }
+
+
 }
+
