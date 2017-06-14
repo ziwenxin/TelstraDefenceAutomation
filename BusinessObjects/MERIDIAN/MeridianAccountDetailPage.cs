@@ -144,6 +144,7 @@ namespace BusinessObjects.MERIDIAN
                 //wait for save btn available
                 WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
                 wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("BUTTON_TOOLBAR_2_btn3_acButton")));
+                Thread.Sleep(500);
                 //save the report
                 SaveBtn.Click();
 

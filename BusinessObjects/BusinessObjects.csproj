@@ -81,6 +81,7 @@
     <Compile Include="MERIDIAN\MeridianPopUpWindow.cs" />
     <Compile Include="MERIDIAN\MeridianVariableEntryPage.cs" />
     <Compile Include="MERIDIAN\MeridianPortalPage.cs" />
+    <Compile Include="SharePoint\SharePointPage.cs" />
     <Compile Include="Toll\TollGoodReportPage.cs" />
     <Compile Include="Toll\TollLoginPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

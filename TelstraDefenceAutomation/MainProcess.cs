@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects;
 using BusinessObjects.MERIDIAN;
+using BusinessObjects.SharePoint;
 using Common;
 using Exceptions;
 using ICSharpCode.SharpZipLib.Tar;
@@ -20,6 +21,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 using PropertyCollection;
 using WinSCP;
 
@@ -38,14 +40,14 @@ namespace TelstraDefenceAutomation
                 configSheet = Intialization();
 
                 //before automation, delete all files in the save folder
-                //DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
+                DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
 
                 ////download excel files
-                //DownLoadTollDocuments();
-                //DownLoadMeridianDocuments();
+                DownLoadTollDocuments();
+                DownLoadMeridianDocuments();
 
                 ////delete several lines at the beginning
-                //ProcessExcels();
+                ProcessExcels();
 
                 //copy files from share folder
                 DownLoadShareFolderDocs();
@@ -53,7 +55,7 @@ namespace TelstraDefenceAutomation
                 //download files from share point
                 DownLoadSharePointDoc();
                 //upload to server
-                //UploadFiles();
+                UploadFiles();
             }
             catch (Exception e)
             {
@@ -77,18 +79,16 @@ namespace TelstraDefenceAutomation
 
         private static void DownLoadSharePointDoc()
         {
-            //go to share point page
-            string URL = configSheet.GetRow(31).GetCell(1).StringCellValue;
-            WebDriver.ChromeDriver.Navigate().GoToUrl(URL);
-            //
-            WebDriver.ChromeDriver.FindElement(By.XPath("//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img"));
-
+            Console.WriteLine("Downloading from share point...");
+            SharePointPage sharePointPage = new SharePointPage(configSheet);
+            sharePointPage.DownLoadSharePointDoc();
+            Console.WriteLine("DownLoad from share point completed");
         }
+
 
         private static void DownLoadShareFolderDocs()
         {
-            //set principal
-            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+            Console.WriteLine("Downloading files from share folder...");
 
             //get username and password
             string username = configSheet.GetRow(22).GetCell(1).StringCellValue;
@@ -104,21 +104,26 @@ namespace TelstraDefenceAutomation
             //copy logistic schedule file
             serverPath += "\\";
             File.Copy(serverPath + filename, localPath + filename, true);
+            Console.WriteLine(filename+" download completed");
             //copy Burwood stock transfer file
             serverPath = configSheet.GetRow(26).GetCell(1).StringCellValue+"\\";
             filename = configSheet.GetRow(27).GetCell(1).StringCellValue;
             filename=GetNewestFileName(serverPath,filename);
             File.Copy(serverPath + filename, localPath + filename, true);
+            Console.WriteLine(filename + " download completed");
+
             //copy Regents transfer stock file
             //copy Burwood stock transfer file
             serverPath = configSheet.GetRow(28).GetCell(1).StringCellValue + "\\";
             filename = configSheet.GetRow(29).GetCell(1).StringCellValue;
             filename = GetNewestFileName(serverPath, filename);
             File.Copy(serverPath + filename, localPath + filename, true);
+            Console.WriteLine(filename + " download completed");
         }
 
         private static void UploadFiles()
         {
+            Console.WriteLine("Start to upload files to server...");
             //setup session options
             SessionOptions options = new SessionOptions
             {
@@ -156,6 +161,7 @@ namespace TelstraDefenceAutomation
                 {
                     Console.WriteLine("Upload of {0} successed", transfer.FileName);
                 }
+                Console.WriteLine("Upload all completed");
             }
 
         }
