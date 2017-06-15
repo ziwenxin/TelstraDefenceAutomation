@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Threading;
 using System.IO;
@@ -34,17 +35,24 @@ namespace TelstraDefenceAutomation
         static void Main(string[] args)
         {
 
+
+            #region MainProcess
+            int retryTimes = 0;
+
             try
             {
                 //read settings and set default download folder for chrome
                 configSheet = Intialization();
 
+                //get retry times
+                retryTimes = (int)configSheet.GetRow(21).GetCell(1).NumericCellValue;
+
                 //before automation, delete all files in the save folder
                 DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
 
                 ////download excel files
-                DownLoadTollDocuments();
                 DownLoadMeridianDocuments();
+                DownLoadTollDocuments();
 
                 ////delete several lines at the beginning
                 ProcessExcels();
@@ -56,24 +64,64 @@ namespace TelstraDefenceAutomation
                 DownLoadSharePointDoc();
                 //upload to server
                 UploadFiles();
+
+                //renew retry times
+                retryTimes = 3;
+
             }
             catch (Exception e)
             {
-                //reshedule one run
-                //RescheduleTask();
+                //if still needs to retry
+                if (retryTimes > 0)
+                {
+                    //reshedule one run
+                    RescheduleTask();
+                    retryTimes--;
+                }
+                //notify admin
+                else
+                {
+                    //reset retry times
+                    retryTimes = 3;
+                    sendEmail();
+                }
                 Console.WriteLine(e);
-                Console.WriteLine("\r\n Press Any Key To Exit");
-                Console.ReadKey();
+                //Console.WriteLine("\r\n Press Any Key To Exit");
+                //Console.ReadKey();
+            }
+            finally
+            {
+                //reset retry times
+                configSheet.GetRow(21).GetCell(1).SetCellValue(retryTimes);
+                //delete the previous file
+
+                if (File.Exists("Config.xlsx"))
+                    File.Delete("Config.xlsx");
+                //write back to config file 
+                ExcelHelper.Save(configSheet, "Config.xlsx");
             }
 
 
 
 
-            Exit();
+            Exit(); 
+            #endregion
 
 
 
 
+
+        }
+
+        private static void sendEmail()
+        {
+            //set address, subject and body of email
+            string emailAddr = configSheet.GetRow(22).GetCell(1).StringCellValue;
+            string subject = "Automation Rerun Failed";
+            string autoPath = configSheet.GetRow(22).GetCell(1).StringCellValue;
+            string body = "Please go to '" + autoPath + "' to run automation.exe file manually, thanks";
+            //send email
+            //outlook
 
         }
 
@@ -91,31 +139,31 @@ namespace TelstraDefenceAutomation
             Console.WriteLine("Downloading files from share folder...");
 
             //get username and password
-            string username = configSheet.GetRow(22).GetCell(1).StringCellValue;
-            string password = configSheet.GetRow(23).GetCell(1).StringCellValue;
+            string username = configSheet.GetRow(24).GetCell(1).StringCellValue;
+            string password = configSheet.GetRow(25).GetCell(1).StringCellValue;
             //get local save path and server path
             string localPath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-            string serverPath = configSheet.GetRow(24).GetCell(1).StringCellValue;
+            string serverPath = configSheet.GetRow(26).GetCell(1).StringCellValue;
             //get filename
-            string filename = configSheet.GetRow(25).GetCell(1).StringCellValue;
+            string filename = configSheet.GetRow(27).GetCell(1).StringCellValue;
             //launch a command line to connect to the server
             connectState(serverPath, username, password);
 
             //copy logistic schedule file
             serverPath += "\\";
             File.Copy(serverPath + filename, localPath + filename, true);
-            Console.WriteLine(filename+" download completed");
+            Console.WriteLine(filename + " download completed");
             //copy Burwood stock transfer file
-            serverPath = configSheet.GetRow(26).GetCell(1).StringCellValue+"\\";
-            filename = configSheet.GetRow(27).GetCell(1).StringCellValue;
-            filename=GetNewestFileName(serverPath,filename);
+            serverPath = configSheet.GetRow(28).GetCell(1).StringCellValue + "\\";
+            filename = configSheet.GetRow(29).GetCell(1).StringCellValue;
+            filename = GetNewestFileName(serverPath, filename);
             File.Copy(serverPath + filename, localPath + filename, true);
             Console.WriteLine(filename + " download completed");
 
             //copy Regents transfer stock file
             //copy Burwood stock transfer file
-            serverPath = configSheet.GetRow(28).GetCell(1).StringCellValue + "\\";
-            filename = configSheet.GetRow(29).GetCell(1).StringCellValue;
+            serverPath = configSheet.GetRow(30).GetCell(1).StringCellValue + "\\";
+            filename = configSheet.GetRow(31).GetCell(1).StringCellValue;
             filename = GetNewestFileName(serverPath, filename);
             File.Copy(serverPath + filename, localPath + filename, true);
             Console.WriteLine(filename + " download completed");
@@ -200,8 +248,10 @@ namespace TelstraDefenceAutomation
                 }
                 catch (Exception e)
                 {
+                    //get the rename
+                    string rename=configSheet.GetRow(6).GetCell(1+i).StringCellValue;
                     //process the file by string
-                    ExcelHelper.ProcessInvalidExcel(savePath, filename);
+                    ExcelHelper.ProcessInvalidExcel(savePath, filename,rename);
                 }
                 Console.WriteLine(filename + " process completed");
             }
@@ -310,8 +360,46 @@ namespace TelstraDefenceAutomation
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
 
             //download files
-            DownLoadPODetailDoc(configSheet, meridianNavigationPage);
-            DownLoadAccDetailDoc(configSheet, meridianNavigationPage);
+            //if it fails, retry it
+            int retryCount = 3;
+            while (true)
+            {
+                try
+                {
+                    DownLoadPODetailDoc(configSheet, meridianNavigationPage);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    //if file exists, delete it
+                    string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+                    string filename = configSheet.GetRow(7).GetCell(5).StringCellValue;
+                    CheckFile(savepath, filename);
+                    if (retryCount <= 0)
+                        throw e;
+                    retryCount--;
+                }
+            }
+            //retry
+            retryCount = 3;
+            while (true)
+            {
+                try
+                {
+                    DownLoadAccDetailDoc(configSheet, meridianNavigationPage);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    //if file exists, delete it
+                    string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+                    string filename = configSheet.GetRow(7).GetCell(6).StringCellValue;
+                    CheckFile(savepath, filename);
+                    if (retryCount <= 0)
+                        throw e;
+                    retryCount--;
+                }
+            }
         }
 
         private static void DownLoadAccDetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
@@ -344,6 +432,7 @@ namespace TelstraDefenceAutomation
             //download PO Detail Reprrt
             PoAccountDetailPage.DownLoadPoDetailDoc(savepath + filename);
             Console.WriteLine(filename + " download completed");
+            //throw new Exception();
         }
 
         //reschedule this task after 1 minutes
@@ -352,13 +441,16 @@ namespace TelstraDefenceAutomation
             //get the service on the local 
             using (TaskService ts = new TaskService())
             {
+                string taskName = "Rerun";
+
                 //create a new task
                 TaskDefinition td = ts.NewTask();
                 td.RegistrationInfo.Description = "Redo the automation";
-
-                //create a trigger that execute this task 2 minutes later
-                td.Triggers.Add(new TimeTrigger(DateTime.Now.AddMinutes(2)));
-
+                //set expires date
+                td.Settings.DeleteExpiredTaskAfter = TimeSpan.FromSeconds(10);
+                //create a trigger that execute this task 1 minutes later
+                td.Triggers.Add(new TimeTrigger {EndBoundary = DateTime.Now.AddMinutes(2)});
+                td.Triggers.Add(new TimeTrigger(DateTime.Now.AddMinutes(1)));
                 //get automation path
                 string autoPath = configSheet.GetRow(19).GetCell(1).StringCellValue;
                 string logPath = configSheet.GetRow(20).GetCell(1).StringCellValue;
@@ -370,11 +462,12 @@ namespace TelstraDefenceAutomation
                 if (!File.Exists(logfile))
                     File.Create(logfile);
                 //create an action
-                td.Actions.Add(new ExecAction(autoPath + "TelstraDefenceAutomation.exe", logfile));
-
+                td.Actions.Add(new ExecAction(autoPath + "TelstraDefenceAutomation.exe", logfile, autoPath));
                 //register the task in the root folder
-                ts.RootFolder.RegisterTaskDefinition(DateTime.Now + " rerun", td);
+                ts.RootFolder.RegisterTaskDefinition(taskName, td);
             }
+
+
         }
 
         private static void Exit()
@@ -433,7 +526,14 @@ namespace TelstraDefenceAutomation
             //get directory info
             DirectoryInfo directory = new DirectoryInfo(filepath);
             //get the latest file
-            return directory.GetFiles(filename+"*.xlsx").OrderByDescending(f=>f.LastWriteTime).First().Name;
+            return directory.GetFiles(filename + "*.xlsx").OrderByDescending(f => f.LastWriteTime).First().Name;
+        }
+
+        private static void CheckFile(string savepath, string filename)
+        {
+            string fullPath = savepath + filename + ".xls";
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
         }
     }
 

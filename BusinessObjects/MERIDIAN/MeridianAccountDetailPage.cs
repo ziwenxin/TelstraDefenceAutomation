@@ -18,7 +18,7 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id, Using = "BUTTON_OPEN_SAVE_btn1_acButton")]
         public IWebElement OpenBtn { get; set; }
 
-        [FindsBy(How = How.Id, Using = "BUTTON_TOOLBAR_2_btn3_acButton")]
+        [FindsBy(How = How.Id, Using = "BUTTON_TOOLBAR_2_btn4_acButton")]
         public IWebElement SaveBtn { get; set; }
 
         [FindsBy(How = How.Id, Using = "FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")]
@@ -118,6 +118,8 @@ namespace BusinessObjects.MERIDIAN
             //save the report
             MeridianAccDetailFilterWindow meridianAccDetailFilterWindow = AddFilter();
             meridianAccDetailFilterWindow.AddFilter();
+            //wait for a while
+            Thread.Sleep(1000);
             //switch back 
             //wait generation of the report
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
@@ -146,7 +148,19 @@ namespace BusinessObjects.MERIDIAN
                 wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("BUTTON_TOOLBAR_2_btn3_acButton")));
                 Thread.Sleep(500);
                 //save the report
-                SaveBtn.Click();
+                try
+                {
+                    SaveBtn.Click();
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(SaveBtn.Location);
+                    Console.WriteLine(SaveBtn.Size);
+                    Console.WriteLine(e);
+                    SaveBtn.Click();
+                    throw e;
+                }
 
                 //wait downloading of the report
                 WaitForLoading();

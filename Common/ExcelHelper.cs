@@ -74,6 +74,13 @@ namespace Common
 
         }
 
+        public static void Save(ISheet sheet,string filename)
+        {
+            using (FileStream fs=new FileStream(filename, FileMode.OpenOrCreate,FileAccess.ReadWrite))
+            {
+                sheet.Workbook.Write(fs);
+            }
+        }
         private static void CopyRow(IRow newRow, IRow srcRow)
         {
             for (int i = 0; i < srcRow.LastCellNum; i++)
@@ -126,7 +133,7 @@ namespace Common
         }
 
         //process excel file with invalid header
-        public static void ProcessInvalidExcel(string path, string filename)
+        public static void ProcessInvalidExcel(string path, string filename,string rename)
         {
             //read all the lines
             int tableTagCount = 0;
@@ -160,7 +167,7 @@ namespace Common
             //make an archive
             MoveFileToArchive(path, filename, ".xls");
             //save the text into a new file
-            File.WriteAllLines(path + filename + ".xls", strList.ToArray());
+            File.WriteAllLines(path + rename + ".xls", strList.ToArray());
 
         }
 
