@@ -34,11 +34,8 @@ namespace TelstraDefenceAutomation
         private static ISheet configSheet;
         static void Main(string[] args)
         {
-
-
             #region MainProcess
             int retryTimes = 0;
-
             try
             {
                 //read settings and set default download folder for chrome
@@ -50,11 +47,11 @@ namespace TelstraDefenceAutomation
                 //before automation, delete all files in the save folder
                 DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
 
-                ////download excel files
-                DownLoadMeridianDocuments();
+                //download excel files
                 DownLoadTollDocuments();
+                DownLoadMeridianDocuments();
 
-                ////delete several lines at the beginning
+                //delete several lines at the beginning
                 ProcessExcels();
 
                 //copy files from share folder
@@ -104,7 +101,7 @@ namespace TelstraDefenceAutomation
 
 
 
-            Exit(); 
+            Exit();
             #endregion
 
 
@@ -248,10 +245,16 @@ namespace TelstraDefenceAutomation
                 }
                 catch (Exception e)
                 {
+                    
                     //get the rename
-                    string rename=configSheet.GetRow(6).GetCell(1+i).StringCellValue;
+                    string rename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
                     //process the file by string
-                    ExcelHelper.ProcessInvalidExcel(savePath, filename,rename);
+                    ExcelHelper.ProcessInvalidExcel(savePath, filename, rename);
+                    //save the incorrupted file as xlsx
+                    OfficeExcel.SaveAs(savePath, rename);
+                    //delete he priginal file
+                    if (File.Exists(savePath + rename + ".xls"))
+                        File.Delete(savePath + rename + ".xls");
                 }
                 Console.WriteLine(filename + " process completed");
             }
@@ -415,7 +418,7 @@ namespace TelstraDefenceAutomation
             string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
             ////download PO Detail Reprrt
             accountDetailPage.DownLoadAccountDetailDoc(savepath + filename);
-            Console.WriteLine("Account Detail download completed");
+            Console.WriteLine(filename + " download completed");
         }
 
         private static void DownLoadPODetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
@@ -449,7 +452,7 @@ namespace TelstraDefenceAutomation
                 //set expires date
                 td.Settings.DeleteExpiredTaskAfter = TimeSpan.FromSeconds(10);
                 //create a trigger that execute this task 1 minutes later
-                td.Triggers.Add(new TimeTrigger {EndBoundary = DateTime.Now.AddMinutes(2)});
+                td.Triggers.Add(new TimeTrigger { EndBoundary = DateTime.Now.AddMinutes(2) });
                 td.Triggers.Add(new TimeTrigger(DateTime.Now.AddMinutes(1)));
                 //get automation path
                 string autoPath = configSheet.GetRow(19).GetCell(1).StringCellValue;

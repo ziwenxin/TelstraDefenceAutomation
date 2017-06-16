@@ -18,7 +18,7 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.Id, Using = "BUTTON_OPEN_SAVE_btn1_acButton")]
         public IWebElement OpenBtn { get; set; }
 
-        [FindsBy(How = How.Id, Using = "BUTTON_TOOLBAR_2_btn4_acButton")]
+        [FindsBy(How = How.Id, Using = "BUTTON_TOOLBAR_2_btn3_acButton")]
         public IWebElement SaveBtn { get; set; }
 
         [FindsBy(How = How.Id, Using = "FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")]
