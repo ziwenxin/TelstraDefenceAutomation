@@ -17,6 +17,8 @@ using Common;
 using Exceptions;
 using ICSharpCode.SharpZipLib.Tar;
 using Microsoft.Win32.TaskScheduler;
+using NetOffice.OutlookApi;
+using NetOffice.OutlookApi.Enums;
 using NPOI.SS.Formula.PTG;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -25,6 +27,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using PropertyCollection;
 using WinSCP;
+using Exception = System.Exception;
 
 
 namespace TelstraDefenceAutomation
@@ -48,8 +51,8 @@ namespace TelstraDefenceAutomation
                 DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
 
                 //download excel files
-                DownLoadTollDocuments();
                 DownLoadMeridianDocuments();
+                DownLoadTollDocuments();
 
                 //delete several lines at the beginning
                 ProcessExcels();
@@ -80,7 +83,7 @@ namespace TelstraDefenceAutomation
                 {
                     //reset retry times
                     retryTimes = 3;
-                    sendEmail();
+                    SendEmail();
                 }
                 Console.WriteLine(e);
                 //Console.WriteLine("\r\n Press Any Key To Exit");
@@ -110,16 +113,31 @@ namespace TelstraDefenceAutomation
 
         }
 
-        private static void sendEmail()
+        private static void SendEmail()
         {
             //set address, subject and body of email
             string emailAddr = configSheet.GetRow(22).GetCell(1).StringCellValue;
             string subject = "Automation Rerun Failed";
-            string autoPath = configSheet.GetRow(22).GetCell(1).StringCellValue;
+            string autoPath = configSheet.GetRow(19).GetCell(1).StringCellValue;
             string body = "Please go to '" + autoPath + "' to run automation.exe file manually, thanks";
-            //send email
-            //outlook
+            //set up a mail
+            Application app=new Application();
+            MailItem mail = (MailItem) app.CreateItem(OlItemType.olMailItem);
 
+            mail.To = emailAddr;
+            mail.Body = body;
+            mail.Subject = subject;
+            //set up account
+            Accounts accs = app.Session.Accounts;
+            Account acc = null;
+            foreach (Account account in accs)
+            {
+                acc = account;
+                break;
+            }
+            mail.SendUsingAccount = acc;
+            //send email
+            mail.Send();
         }
 
         private static void DownLoadSharePointDoc()
@@ -435,7 +453,7 @@ namespace TelstraDefenceAutomation
             //download PO Detail Reprrt
             PoAccountDetailPage.DownLoadPoDetailDoc(savepath + filename);
             Console.WriteLine(filename + " download completed");
-            //throw new Exception();
+            throw new Exception();
         }
 
         //reschedule this task after 1 minutes
