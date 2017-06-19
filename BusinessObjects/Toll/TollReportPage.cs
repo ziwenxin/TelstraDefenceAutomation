@@ -14,6 +14,7 @@ namespace BusinessObjects
 {
     public class TollReportPage
     {
+        #region WebElements
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl00")]
         public IWebElement ViewReportBtn { get; set; }
 
@@ -21,10 +22,18 @@ namespace BusinessObjects
         public IWebElement SaveIcon { get; set; }
 
         [FindsBy(How = How.XPath, Using = "//a[@title='Excel']")]
-        public IWebElement ExcelSaveLink { get; set; }
+        public IWebElement ExcelSaveLink { get; set; } 
+        #endregion
 
+        /// <summary>
+        /// abstract method
+        /// </summary>
         public virtual void AddFilter() { }
 
+        /// <summary>
+        /// download method from each page
+        /// </summary>
+        /// <param name="fullpath"></param>
         public void DownLoadReport(string fullpath)
         {
             IWebDriver driver = WebDriver.ChromeDriver;
@@ -43,6 +52,10 @@ namespace BusinessObjects
             RetryDownload(fullpath);
         }
 
+        /// <summary>
+        /// retry 3 times for download action
+        /// </summary>
+        /// <param name="fullpath"></param>
         public void RetryDownload(string fullpath)
         {
             //retry downloading

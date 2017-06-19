@@ -15,6 +15,8 @@ namespace BusinessObjects
 {
     public class TollGoodReportPage :TollReportPage
     {
+        #region WebElements
+
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl03_txtValue")]
         public IWebElement FromDateField { get; set; }
 
@@ -25,7 +27,8 @@ namespace BusinessObjects
         public IWebElement OwnerIdCbl { get; set; }
 
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl07_divDropDown_ctl08")]
-        public IWebElement OwnerIdCb { get; set; }
+        public IWebElement OwnerIdCb { get; set; } 
+        #endregion
 
 
 
@@ -35,6 +38,9 @@ namespace BusinessObjects
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
 
+        /// <summary>
+        /// add date range, which is from the start of this year to now. Also, click 'TelDef' check box
+        /// </summary>
         public override void AddFilter()
         {
 

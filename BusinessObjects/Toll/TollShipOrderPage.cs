@@ -12,6 +12,7 @@ namespace BusinessObjects
     public class TollShipOrderPage :TollReportPage
     {
 
+        #region WebElements
 
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl05_txtValue")]
         public IWebElement FromDateField { get; set; }
@@ -24,7 +25,8 @@ namespace BusinessObjects
         public IWebElement FromDateCheckBox { get; set; }
 
         [FindsBy(How = How.Id, Using = "ReportViewer1_ctl04_ctl07_cbNull")]
-        public IWebElement ToDateCheckBox { get; set; }
+        public IWebElement ToDateCheckBox { get; set; } 
+        #endregion
 
         public TollShipOrderPage()
         {
@@ -32,7 +34,9 @@ namespace BusinessObjects
 
         }
 
-
+        /// <summary>
+        /// add date from the start of year to now
+        /// </summary>
         public override void AddFilter()
         {
             //uncheck the null boxes

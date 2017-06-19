@@ -15,17 +15,27 @@ namespace BusinessObjects.SharePoint
 {
     public class SharePointPage
     {
+        //config sheet
         private ISheet ConfigSheet { get; set; }
 
-        [FindsBy(How = How.XPath,Using = "//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img")]
-        public IWebElement SaveIcon { get; set; }
+        #region webElement
+        [FindsBy(How = How.XPath, Using = "//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img")]
+        public IWebElement SaveIcon { get; set; } 
+        #endregion
 
+        /// <summary>
+        ///  initialize and set config sheet
+        /// </summary>
+        /// <param name="configSheet"></param>
         public SharePointPage(ISheet configSheet)
         {
             ConfigSheet = configSheet;
             PageFactory.InitElements(WebDriver.ChromeDriver,this);
         }
 
+        /// <summary>
+        /// go to share point page and download document
+        /// </summary>
         public void DownLoadSharePointDoc()
         {
             //go to the share point page
@@ -42,6 +52,9 @@ namespace BusinessObjects.SharePoint
 
         }
 
+        /// <summary>
+        /// retry 3 times for the navigation
+        /// </summary>
         public void RetryNavigation()
         {
             int retryCount = 3;
@@ -66,6 +79,9 @@ namespace BusinessObjects.SharePoint
             }
         }
 
+        /// <summary>
+        /// go to the share point page
+        /// </summary>
         private void GoToMainPage()
         {
             //go to share point page
@@ -73,6 +89,10 @@ namespace BusinessObjects.SharePoint
             WebDriver.ChromeDriver.Navigate().GoToUrl(URL);
         }
 
+        /// <summary>
+        /// retry 3 times for the download action
+        /// </summary>
+        /// <param name="fullpath"></param>
         public void RetryDownload(string fullpath)
         {
             //retry downloading

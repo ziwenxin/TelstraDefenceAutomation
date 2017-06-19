@@ -15,10 +15,14 @@ namespace BusinessObjects.MERIDIAN
 
     public class MeridianPortalPage
     {
+        //config sheet
         public ISheet ConfigSheet { get; set; }
 
+
+        #region WebElements
         [FindsBy(How = How.Id, Using = "2406890")]
-        public IWebElement MeridianLaunchImg { get; set; }
+        public IWebElement MeridianLaunchImg { get; set; } 
+        #endregion
 
         public MeridianPortalPage(ISheet configSheet)
         {
@@ -27,6 +31,10 @@ namespace BusinessObjects.MERIDIAN
 
         }
 
+        /// <summary>
+        /// go to the portal and launch meridian
+        /// </summary>
+        /// <returns>an object of navigation page</returns>
         public MeridianNavigationPage LaunchMeridian()
         {
             int retryCount = 3;

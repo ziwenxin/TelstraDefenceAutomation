@@ -13,11 +13,13 @@ namespace BusinessObjects.MERIDIAN
 {
     public class MeridianPopUpWindow :MeridianCenterPage
     {
-        [FindsBy(How = How.Id,Using = "LOAD_state_tigen4_tlv1_list_unid27_tv")]
+        #region WebElements
+        [FindsBy(How = How.Id, Using = "LOAD_state_tigen4_tlv1_list_unid27_tv")]
         public IWebElement PODetailSpan { get; set; }
 
         [FindsBy(How = How.Id, Using = "LOAD_state_tigen4_tlv1_list_unid7_tv")]
-        public IWebElement AccountDetailSpan { get; set; }
+        public IWebElement AccountDetailSpan { get; set; } 
+        #endregion
 
 
 
@@ -27,6 +29,9 @@ namespace BusinessObjects.MERIDIAN
 
         }
 
+        /// <summary>
+        /// select the span of PO Detail and go to the detail page
+        /// </summary>
         public void SelectPODetailDoc()
         {
             //wait the span valid
@@ -39,7 +44,9 @@ namespace BusinessObjects.MERIDIAN
             //click OK Button
             clickOkBtn();
         }
-
+        /// <summary>
+        /// select the span of Account Detail and go to the detail page
+        /// </summary>
         public void SelectAccountDetailDoc()
         {
             //wait the span valid

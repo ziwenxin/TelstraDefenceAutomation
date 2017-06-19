@@ -19,31 +19,37 @@ namespace BusinessObjects
 {
     public class TollLoginPage
     {
-        //store data from json
+        //config sheet
         private ISheet Configsheet;
 
+        #region WebElements
         [FindsBy(How = How.Id, Using = "UserName")]
         public IWebElement UserNameField { get; set; }
 
         [FindsBy(How = How.Id, Using = "Password")]
         public IWebElement PasswordField { get; set; }
 
-        //[FindsBy(How = How.TagName, Using = "button")]
 
         [FindsBy(How = How.XPath, Using = "//button[text()='Login']")]
-        public IWebElement LoginBtn { get; set; }
+        public IWebElement LoginBtn { get; set; } 
+        #endregion
 
-
+        /// <summary>
+        /// initialize and set config sheet
+        /// </summary>
+        /// <param name="Configsheet"></param>
         public TollLoginPage(ISheet Configsheet)
         {
-            //inital
+            //initialize
             this.Configsheet = Configsheet;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
 
         }
-
+        /// <summary>
+        /// go to the login page of Toll
+        /// </summary>
         public void GoToLoginPage()
         {
             IWebDriver driver = WebDriver.ChromeDriver;
@@ -59,7 +65,10 @@ namespace BusinessObjects
 
         }
 
-
+        /// <summary>
+        /// login action
+        /// </summary>
+        /// <returns></returns>
         public TollReportDownloadPage Login()
         {
 

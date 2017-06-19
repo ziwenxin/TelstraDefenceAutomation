@@ -17,7 +17,10 @@ namespace PropertyCollection
         {
             
         }
-
+        /// <summary>
+        /// enable pop up window for chrome and set download path for chrome
+        /// </summary>
+        /// <param name="path">the download path for chrome</param>
         public static void Init(string path)
         {
             //change the download location

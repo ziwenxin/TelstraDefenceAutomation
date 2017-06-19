@@ -13,6 +13,8 @@ namespace BusinessObjects.MERIDIAN
 {
     public class MeridianAccDetailFilterWindow : MeridianCenterPage
     {
+        #region WebElements
+
         [FindsBy(How = How.Id, Using = "SELECTOR_mainctrl_componentListControl_unid19_tv")]
         public IWebElement DateRow { get; set; }
 
@@ -26,7 +28,8 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement ValueDpList { get; set; }
 
         [FindsBy(How = How.Id, Using = "SELECTOR_mainctrl_range_parseInput_inp")]
-        public IWebElement InvoiceDateField { get; set; }
+        public IWebElement InvoiceDateField { get; set; } 
+        #endregion
 
         public MeridianAccDetailFilterWindow()
         {
@@ -34,7 +37,9 @@ namespace BusinessObjects.MERIDIAN
         }
 
 
-
+        /// <summary>
+        /// add date filter, which is 3 month ago to now
+        /// </summary>
         public void AddFilter()
         {
             //wait for the remove button
@@ -67,7 +72,7 @@ namespace BusinessObjects.MERIDIAN
             //wait for invoice date field
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("SELECTOR_mainctrl_range_parseInput_inp")));
 
-            //enter into vendor ininvoce date
+            //enter into vendor invoice date
             InvoiceDateField.SendKeys(filterStr);
             //click add button
             AddBtn.Click();

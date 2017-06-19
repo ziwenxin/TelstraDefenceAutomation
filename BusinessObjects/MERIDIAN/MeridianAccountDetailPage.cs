@@ -15,6 +15,9 @@ namespace BusinessObjects.MERIDIAN
 {
     public class MeridianAccountDetailPage : MeridianCenterPage
     {
+
+        #region WebElements
+
         [FindsBy(How = How.Id, Using = "BUTTON_OPEN_SAVE_btn1_acButton")]
         public IWebElement OpenBtn { get; set; }
 
@@ -22,14 +25,18 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement SaveBtn { get; set; }
 
         [FindsBy(How = How.Id, Using = "FILTER_PANE_ac_feodd_0DOC_DATE_dropdown_combobox")]
-        public IWebElement InvoiceDateFilterDpList { get; set; }
+        public IWebElement InvoiceDateFilterDpList { get; set; } 
+        #endregion
 
 
         public MeridianAccountDetailPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
-
+        /// <summary>
+        /// click open button to open the document selector
+        /// </summary>
+        /// <returns>an object of pop up window</returns>
         public MeridianPopUpWindow OpenPoPUpWindow()
         {
             //wait for open button appears
@@ -48,7 +55,9 @@ namespace BusinessObjects.MERIDIAN
             return new MeridianPopUpWindow();
         }
 
-
+        /// <summary>
+        /// wait for the loading image disappear
+        /// </summary>
         public void WaitForLoading()
         {
 
@@ -59,7 +68,10 @@ namespace BusinessObjects.MERIDIAN
 
         }
 
-
+        /// <summary>
+        /// find the date filter and click the 'edit' link
+        /// </summary>
+        /// <returns>an object of date filter window</returns>
         public MeridianAccDetailFilterWindow AddFilter()
         {
             //wait drop list clickable
@@ -87,6 +99,10 @@ namespace BusinessObjects.MERIDIAN
             return new MeridianAccDetailFilterWindow();
         }
 
+        /// <summary>
+        /// download PO Detail Document
+        /// </summary>
+        /// <param name="fullpath"></param>
         public void DownLoadPoDetailDoc(string fullpath)
         {
             //wait generation of the report
@@ -105,7 +121,10 @@ namespace BusinessObjects.MERIDIAN
 
         }
 
-
+        /// <summary>
+        /// download account detial document
+        /// </summary>
+        /// <param name="fullpath"></param>
         public void DownLoadAccountDetailDoc(string fullpath)
         {
             //wait generation of the report
@@ -137,6 +156,10 @@ namespace BusinessObjects.MERIDIAN
 
         }
 
+        /// <summary>
+        /// retry the download action for 3 times 
+        /// </summary>
+        /// <param name="fullpath"></param>
         public void RetryDownloading(string fullpath)
         {
             //retry downloading
@@ -150,6 +173,8 @@ namespace BusinessObjects.MERIDIAN
                 //save the report
                 try
                 {
+                    //try to avoid some exceptions
+                    SaveBtn.SendKeys(Keys.Enter);
                     SaveBtn.Click();
 
                 }

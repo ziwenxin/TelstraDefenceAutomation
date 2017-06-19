@@ -11,6 +11,7 @@ namespace BusinessObjects.MERIDIAN
 {
     public class MeridianCenterPage
     {
+        #region WebElements
         [FindsBy(How = How.Id, Using = "isolatedWorkArea")]
         public IWebElement CenterFrame { get; set; }
 
@@ -28,12 +29,15 @@ namespace BusinessObjects.MERIDIAN
 
         [FindsBy(How = How.Id, Using = "urPopupOuter0")]
         public IWebElement OutterFrame { get; set; }
+        #endregion
 
         public MeridianCenterPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver,this);
         }
-
+        /// <summary>
+        /// click ok button to display the reports in the center main window
+        /// </summary>
         public void clickOkBtn()
         {
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();

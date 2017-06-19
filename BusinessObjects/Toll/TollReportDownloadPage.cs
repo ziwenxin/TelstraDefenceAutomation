@@ -14,8 +14,10 @@ namespace BusinessObjects
 {
     public class TollReportDownloadPage
     {
+        //config sheet 
         private ISheet configSheet;
 
+        #region WebElements
 
         [FindsBy(How = How.XPath, Using = "//a[text()='TelDef - Goods Receipt By Date Range']")]
         public IWebElement GoodReportLink { get; set; }
@@ -27,8 +29,13 @@ namespace BusinessObjects
         public IWebElement SOHDetailLink { get; set; }
 
         [FindsBy(How = How.XPath, Using = "//iframe")]
-        public IWebElement ReportFrame { get; set; }
-
+        public IWebElement ReportFrame { get; set; } 
+        #endregion
+        
+        /// <summary>
+        /// initialize and set config sheet
+        /// </summary>
+        /// <param name="Configsheet"></param>
         public TollReportDownloadPage(ISheet Configsheet)
         {
             //get configsheet and WebDriver.ChromeDriver
@@ -39,7 +46,7 @@ namespace BusinessObjects
             int totalDocuments = (int)configSheet.GetRow(6).GetCell(1).NumericCellValue;
             if (totalDocuments <= 0)
                 throw new NoReportsException();
-            //swtich to report frame
+            //switch to report frame
             int retryCount = 3;//retry 3 times if fail to navigate
             while (true)
             {
@@ -60,7 +67,9 @@ namespace BusinessObjects
 
 
         }
-
+        /// <summary>
+        /// go to the report page, which contains all the link of reports
+        /// </summary>
         public void GoToReportPage()
         {
             WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(4).GetCell(1).StringCellValue);
@@ -69,6 +78,10 @@ namespace BusinessObjects
 
         }
 
+        /// <summary>
+        /// download good document
+        /// </summary>
+        /// <returns>an object of good document page</returns>
         public TollGoodReportPage DownloadGoodDocument()
         {
             //wait for the link appears
@@ -78,7 +91,10 @@ namespace BusinessObjects
             GoodReportLink.Click();
             return new TollGoodReportPage();
         }
-
+        /// <summary>
+        /// download ship order report
+        /// </summary>
+        /// <returns>an object of ship order page</returns>
         public TollShipOrderPage DownLoadShipOrder()
         {
             //wait for the link appears
@@ -89,7 +105,10 @@ namespace BusinessObjects
             ShipDetailLink.Click();
             return new TollShipOrderPage();
         }
-
+        /// <summary>
+        /// download SOH detail report
+        /// </summary>
+        /// <returns>an object of SOH detail page</returns>
         public TollSOHDetailPage DownloadSOHDetail()
         {
             //wait for the link appears

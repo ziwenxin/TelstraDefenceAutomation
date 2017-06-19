@@ -13,6 +13,8 @@ namespace BusinessObjects.MERIDIAN
 {
     public class MeridianNavigationPage
     {
+        #region WebElements
+
         [FindsBy(How = How.XPath, Using = "//a[text()='General Reporting']")]
         public IWebElement GeneralReportLink { get; set; }
 
@@ -28,11 +30,17 @@ namespace BusinessObjects.MERIDIAN
         [FindsBy(How = How.XPath, Using = "//a[text()='PO Details']")]
         public IWebElement PODetailsLink { get; set; }
 
+        #endregion
         public MeridianNavigationPage()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
 
+        /// <summary>
+        /// Enter the detail and go to PO detail page
+        /// </summary>
+        /// <param name="configSheet"></param>
+        /// <returns>an object of variable entry page</returns>
         public MeridianVariableEntryPage GotoPoDetailEntryPage(ISheet configSheet)
         {
             //wait general report link exists
@@ -51,6 +59,11 @@ namespace BusinessObjects.MERIDIAN
             return new MeridianVariableEntryPage(configSheet);
         }
 
+        /// <summary>
+        /// Enter the detail and go to Account detail page
+        /// </summary>
+        /// <param name="configSheet"></param>
+        /// <returns>an object of variable entry page</returns>
         public MeridianVariableEntryPage GotoAccountDetailEntryPage(ISheet configSheet)
         {
             //wait general report link exists

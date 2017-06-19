@@ -36,12 +36,11 @@ namespace TelstraDefenceAutomation
 {
     public class MainProcess
     {
+        //static member to store config file
         private static ISheet configSheet;
         static void Main(string[] args)
         {
 
-            //run lavastrom application
-            RunLavaStorm();
             #region MainProcess
             int retryTimes = 0;
             try
@@ -57,8 +56,8 @@ namespace TelstraDefenceAutomation
                 DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
 
                 //download excel files
-                DownLoadMeridianDocuments();
                 DownLoadTollDocuments();
+                DownLoadMeridianDocuments();
 
                 //delete several lines at the beginning
                 ProcessExcels();
@@ -71,6 +70,8 @@ namespace TelstraDefenceAutomation
                 //upload to server
                 UploadFiles();
 
+                //run lavastorm program
+                RunLavaStorm();
                 //renew retry times
                 retryTimes = 3;
 
@@ -80,7 +81,7 @@ namespace TelstraDefenceAutomation
                 //if still needs to retry
                 if (retryTimes > 0)
                 {
-                    //reshedule one run
+                    //reschedule one run
                     RescheduleTask();
                     retryTimes--;
                 }
@@ -107,7 +108,7 @@ namespace TelstraDefenceAutomation
                 ExcelHelper.Save(configSheet, "Config.xlsx");
             }
 
-            
+
 
 
 
@@ -120,6 +121,9 @@ namespace TelstraDefenceAutomation
 
         }
 
+        /// <summary>
+        /// run lavastrom to process the excel files in the server side
+        /// </summary>
         private static void RunLavaStorm()
         {
             //new a process to open the file
@@ -134,6 +138,10 @@ namespace TelstraDefenceAutomation
                 proc.StartInfo.CreateNoWindow = true;
                 //start and input
                 proc.Start();
+                //get program folder and name
+                string folder = configSheet.GetRow(36).GetCell(1).StringCellValue;
+                string filename = configSheet.GetRow(37).GetCell(1).StringCellValue;
+
                 string dosLine = @"D:\Users\D795314\DATA_IMPORT38_for_test.brg";
                 proc.StandardInput.WriteLine(dosLine);
                 //exit
@@ -177,6 +185,9 @@ namespace TelstraDefenceAutomation
 
         }
 
+        /// <summary>
+        /// send a email to the address in config file, using the current outlook account
+        /// </summary>
         private static void SendEmail()
         {
             //set address, subject and body of email
@@ -185,8 +196,8 @@ namespace TelstraDefenceAutomation
             string autoPath = configSheet.GetRow(19).GetCell(1).StringCellValue;
             string body = "Please go to '" + autoPath + "' to run automation.exe file manually, thanks";
             //set up a mail
-            Application app=new Application();
-            MailItem mail = (MailItem) app.CreateItem(OlItemType.olMailItem);
+            Application app = new Application();
+            MailItem mail = (MailItem)app.CreateItem(OlItemType.olMailItem);
 
             mail.To = emailAddr;
             mail.Body = body;
@@ -204,6 +215,9 @@ namespace TelstraDefenceAutomation
             mail.Send();
         }
 
+        /// <summary>
+        /// download 'Deployment Planning and Tracking' from share point
+        /// </summary>
         private static void DownLoadSharePointDoc()
         {
             //download file from share point
@@ -215,12 +229,14 @@ namespace TelstraDefenceAutomation
             string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
             string filename = configSheet.GetRow(34).GetCell(1).StringCellValue;
             //set sheet name
-            OfficeExcel.ChangeSheetName(savepath,filename,"BV & SA","BVSA");
+            OfficeExcel.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
 
             Console.WriteLine("DownLoad from share point completed");
         }
 
-
+        /// <summary>
+        /// download 'Logistics','All-CECs-StockTransfer Burwood' and 'All-CECs-StockTransfer-Regents' from share folder
+        /// </summary>
         private static void DownLoadShareFolderDocs()
         {
             Console.WriteLine("Downloading files from share folder...");
@@ -257,6 +273,9 @@ namespace TelstraDefenceAutomation
             Console.WriteLine(filename + " download completed");
         }
 
+        /// <summary>
+        /// upload all the files to the server using WinScp
+        /// </summary>
         private static void UploadFiles()
         {
             Console.WriteLine("Start to upload files to server...");
@@ -302,6 +321,9 @@ namespace TelstraDefenceAutomation
 
         }
 
+        /// <summary>
+        /// process the excel files downloaded from 'Toll' and 'Meridian', it mainly delete several lines from the top of the documents
+        /// </summary>
         private static void ProcessExcels()
         {
             Console.WriteLine("Processing Excel files...");
@@ -336,7 +358,7 @@ namespace TelstraDefenceAutomation
                 }
                 catch (Exception e)
                 {
-                    
+
                     //get the rename
                     string rename = configSheet.GetRow(6).GetCell(1 + i).StringCellValue;
                     //process the file by string
@@ -354,7 +376,10 @@ namespace TelstraDefenceAutomation
 
         }
 
-        //delete all files but not folders in a folder
+        /// <summary>
+        /// delete all the files in the local save path, excluding the folder
+        /// </summary>
+        /// <param name="path"></param>
         private static void DeleteAllFiles(string path)
         {
             Console.WriteLine("Deleting all previous files...");
@@ -366,6 +391,10 @@ namespace TelstraDefenceAutomation
             Console.WriteLine("Delete completed");
         }
 
+        /// <summary>
+        /// initial the webdriver and read data from config file
+        /// </summary>
+        /// <returns>the work sheet of config file</returns>
         private static ISheet Intialization()
         {
             Console.WriteLine("Inialising...");
@@ -403,6 +432,9 @@ namespace TelstraDefenceAutomation
             return sheet;
         }
 
+        /// <summary>
+        /// download 'TelDef - Shipped Order Report','TelDef - SOH Detail' and 'TelDef - Goods Receipt By Date Range' from toll 
+        /// </summary>
         private static void DownLoadTollDocuments()
         {
             Console.WriteLine("DownLoading documents from Toll...");
@@ -446,6 +478,9 @@ namespace TelstraDefenceAutomation
 
         }
 
+        /// <summary>
+        /// download 'PO_DETAILS_REPORT' and 'Accounting_Details_from_meridian' from Meridian
+        /// </summary>
         private static void DownLoadMeridianDocuments()
         {
             Console.WriteLine("Downloading Meridian documents...");
@@ -468,10 +503,12 @@ namespace TelstraDefenceAutomation
                     //if file exists, delete it
                     string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
                     string filename = configSheet.GetRow(7).GetCell(4).StringCellValue;
-                    CheckFile(savepath, filename);
+                    DeleteFile(savepath, filename);
                     if (retryCount <= 0)
                         throw e;
                     retryCount--;
+                    //switch back to main frame
+                    WebDriver.ChromeDriver.SwitchTo().DefaultContent();
                 }
             }
             //retry
@@ -488,14 +525,21 @@ namespace TelstraDefenceAutomation
                     //if file exists, delete it
                     string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
                     string filename = configSheet.GetRow(7).GetCell(5).StringCellValue;
-                    CheckFile(savepath, filename);
+                    DeleteFile(savepath, filename);
                     if (retryCount <= 0)
                         throw e;
                     retryCount--;
+                    //switch back to main frame
+                    WebDriver.ChromeDriver.SwitchTo().DefaultContent();
                 }
             }
         }
 
+        /// <summary>
+        /// download 'Accounting_Details_from_meridian'
+        /// </summary>
+        /// <param name="configSheet"></param>
+        /// <param name="meridianNavigationPage"></param>
         private static void DownLoadAccDetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
         {
             //go to account payable entry detail page
@@ -512,6 +556,11 @@ namespace TelstraDefenceAutomation
             Console.WriteLine(filename + " download completed");
         }
 
+        /// <summary>
+        /// download 'PO_DETAILS_REPORT'
+        /// </summary>
+        /// <param name="configSheet"></param>
+        /// <param name="meridianNavigationPage"></param>
         private static void DownLoadPODetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
         {
             //go to PO detail
@@ -526,10 +575,12 @@ namespace TelstraDefenceAutomation
             //download PO Detail Reprrt
             PoAccountDetailPage.DownLoadPoDetailDoc(savepath + filename);
             Console.WriteLine(filename + " download completed");
-            
+
         }
 
-        //reschedule this task after 1 minutes
+        /// <summary>
+        /// reschedule the program after 1 min
+        /// </summary>
         public static void RescheduleTask()
         {
             //get the service on the local 
@@ -564,6 +615,9 @@ namespace TelstraDefenceAutomation
 
         }
 
+        /// <summary>
+        /// exit the program
+        /// </summary>
         private static void Exit()
         {
             Console.WriteLine("The automation will be closed in 5 secs");
@@ -574,6 +628,13 @@ namespace TelstraDefenceAutomation
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// connect to the remote share folder
+        /// </summary>
+        /// <param name="path">share folder path</param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns> if connect success</returns>
         private static bool ConnectState(string path, string username, string password)
         {
             //connect result
@@ -614,6 +675,12 @@ namespace TelstraDefenceAutomation
             return flag;
         }
 
+        /// <summary>
+        /// find the newest version of file in the share folder
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="filename"></param>
+        /// <returns>the newest file name</returns>
         private static string GetNewestFileName(string filepath, string filename)
         {
 
@@ -622,8 +689,12 @@ namespace TelstraDefenceAutomation
             //get the latest file
             return directory.GetFiles(filename + "*.xlsx").OrderByDescending(f => f.LastWriteTime).First().Name;
         }
-
-        private static void CheckFile(string savepath, string filename)
+        /// <summary>
+        /// Delete a file if exists
+        /// </summary>
+        /// <param name="savepath"></param>
+        /// <param name="filename"></param>
+        private static void DeleteFile(string savepath, string filename)
         {
             string fullPath = savepath + filename + ".xls";
             if (File.Exists(fullPath))
