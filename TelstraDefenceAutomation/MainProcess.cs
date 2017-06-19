@@ -10,6 +10,8 @@ using System.Runtime.Remoting.Contexts;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using WindowsInput;
+using WindowsInput.Native;
 using BusinessObjects;
 using BusinessObjects.MERIDIAN;
 using BusinessObjects.SharePoint;
@@ -37,13 +39,17 @@ namespace TelstraDefenceAutomation
         private static ISheet configSheet;
         static void Main(string[] args)
         {
+
+            //run lavastrom application
+            RunLavaStorm();
             #region MainProcess
             int retryTimes = 0;
             try
             {
+                //kill all the excel process
+                KillALLProcess("EXCEL");
                 //read settings and set default download folder for chrome
                 configSheet = Intialization();
-
                 //get retry times
                 retryTimes = (int)configSheet.GetRow(21).GetCell(1).NumericCellValue;
 
@@ -101,6 +107,7 @@ namespace TelstraDefenceAutomation
                 ExcelHelper.Save(configSheet, "Config.xlsx");
             }
 
+            
 
 
 
@@ -110,6 +117,63 @@ namespace TelstraDefenceAutomation
 
 
 
+
+        }
+
+        private static void RunLavaStorm()
+        {
+            //new a process to open the file
+            using (Process proc = new Process())
+            {
+                //set parameters
+                proc.StartInfo.FileName = "cmd.exe";
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.RedirectStandardInput = true;
+                proc.StartInfo.RedirectStandardOutput = true;
+                proc.StartInfo.RedirectStandardError = true;
+                proc.StartInfo.CreateNoWindow = true;
+                //start and input
+                proc.Start();
+                string dosLine = @"D:\Users\D795314\DATA_IMPORT38_for_test.brg";
+                proc.StandardInput.WriteLine(dosLine);
+                //exit
+                proc.StandardInput.WriteLine("exit");
+                //wait for the application appears
+                Thread.Sleep(30000);
+                //input simulator
+                InputSimulator simulator = new InputSimulator();
+                //move the mouse
+                simulator.Mouse.MoveMouseTo(33000, 30000);
+                simulator.Mouse.LeftButtonClick();
+                Thread.Sleep(1000);
+
+                //select all the process
+                simulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_A);
+                //press run
+                //wait for while
+                Thread.Sleep(1000);
+                simulator.Keyboard.KeyPress(VirtualKeyCode.F5);
+                //wait for running
+                Thread.Sleep(30000);
+                //kill the process
+                KillALLProcess("bre");
+            }
+
+
+
+        }
+
+        /// <summary>
+        /// kill all the process with processName
+        /// </summary>
+        /// <param name="processName"></param>
+        private static void KillALLProcess(string processName)
+        {
+            //kill all the processes
+            foreach (Process process in Process.GetProcessesByName(processName))
+            {
+                process.Kill();
+            }
 
         }
 
@@ -142,9 +206,17 @@ namespace TelstraDefenceAutomation
 
         private static void DownLoadSharePointDoc()
         {
+            //download file from share point
             Console.WriteLine("Downloading from share point...");
             SharePointPage sharePointPage = new SharePointPage(configSheet);
             sharePointPage.DownLoadSharePointDoc();
+            //change 1 sheet name from BV & SA to BVSA
+            //get path and filename
+            string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+            string filename = configSheet.GetRow(34).GetCell(1).StringCellValue;
+            //set sheet name
+            OfficeExcel.ChangeSheetName(savepath,filename,"BV & SA","BVSA");
+
             Console.WriteLine("DownLoad from share point completed");
         }
 
@@ -162,9 +234,10 @@ namespace TelstraDefenceAutomation
             //get filename
             string filename = configSheet.GetRow(27).GetCell(1).StringCellValue;
             //launch a command line to connect to the server
-            connectState(serverPath, username, password);
+            ConnectState(serverPath, username, password);
 
             //copy logistic schedule file
+            filename += ".xlsx";
             serverPath += "\\";
             File.Copy(serverPath + filename, localPath + filename, true);
             Console.WriteLine(filename + " download completed");
@@ -394,7 +467,7 @@ namespace TelstraDefenceAutomation
                 {
                     //if file exists, delete it
                     string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                    string filename = configSheet.GetRow(7).GetCell(5).StringCellValue;
+                    string filename = configSheet.GetRow(7).GetCell(4).StringCellValue;
                     CheckFile(savepath, filename);
                     if (retryCount <= 0)
                         throw e;
@@ -414,7 +487,7 @@ namespace TelstraDefenceAutomation
                 {
                     //if file exists, delete it
                     string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                    string filename = configSheet.GetRow(7).GetCell(6).StringCellValue;
+                    string filename = configSheet.GetRow(7).GetCell(5).StringCellValue;
                     CheckFile(savepath, filename);
                     if (retryCount <= 0)
                         throw e;
@@ -453,7 +526,7 @@ namespace TelstraDefenceAutomation
             //download PO Detail Reprrt
             PoAccountDetailPage.DownLoadPoDetailDoc(savepath + filename);
             Console.WriteLine(filename + " download completed");
-            throw new Exception();
+            
         }
 
         //reschedule this task after 1 minutes
@@ -501,7 +574,7 @@ namespace TelstraDefenceAutomation
             Environment.Exit(0);
         }
 
-        private static bool connectState(string path, string username, string password)
+        private static bool ConnectState(string path, string username, string password)
         {
             //connect result
             bool flag = false;

@@ -14,7 +14,11 @@ namespace Common
 {
     public static class ExcelHelper
     {
-
+        /// <summary>
+        /// read an excel
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         public static ISheet ReadExcel(string filepath)
         {
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
@@ -26,7 +30,11 @@ namespace Common
             }
         }
 
-        //delete a number of rows
+        /// <summary>
+        /// delete a number of rows from a sheet
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="num"></param>
         public static void DeleteRows(ISheet sheet, int num)
         {
 
@@ -40,7 +48,12 @@ namespace Common
 
         }
 
-        //save a excel
+        /// <summary>
+        /// save a file to another path, delete several lines in it
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="path"></param>
+        /// <param name="linesToBeDeleted"></param>
         public static void SaveTo(ISheet sheet, string path, int linesToBeDeleted)
         {
             path = RemoveV2(path);
@@ -73,6 +86,11 @@ namespace Common
 
         }
 
+        /// <summary>
+        /// save a excel file
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="filename"></param>
         public static void Save(ISheet sheet,string filename)
         {
             using (FileStream fs=new FileStream(filename, FileMode.OpenOrCreate,FileAccess.ReadWrite))
@@ -80,6 +98,11 @@ namespace Common
                 sheet.Workbook.Write(fs);
             }
         }
+        /// <summary>
+        /// copy a row
+        /// </summary>
+        /// <param name="newRow"></param>
+        /// <param name="srcRow"></param>
         private static void CopyRow(IRow newRow, IRow srcRow)
         {
             for (int i = 0; i < srcRow.LastCellNum; i++)
@@ -89,7 +112,11 @@ namespace Common
             }
         }
 
-        //copy data in a cell
+        /// <summary>
+        /// copy a cell
+        /// </summary>
+        /// <param name="newCell"></param>
+        /// <param name="srcCell"></param>
         private static void CopyCell(ICell newCell, ICell srcCell)
         {
 
@@ -131,7 +158,12 @@ namespace Common
             }
         }
 
-        //process excel file with invalid header
+        /// <summary>
+        /// process the corrupted file and rename it
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="filename"></param>
+        /// <param name="rename"></param>
         public static void ProcessInvalidExcel(string path, string filename,string rename)
         {
             //read all the lines
@@ -170,7 +202,12 @@ namespace Common
 
         }
 
-
+        /// <summary>
+        /// move a file to archive, this will delete the original file
+        /// </summary>
+        /// <param name="savePath"></param>
+        /// <param name="filename"></param>
+        /// <param name="extension"></param>
         public static void MoveFileToArchive(string savePath, string filename, string extension)
         {
             //save set archivepath and archive file name
@@ -197,6 +234,11 @@ namespace Common
             File.Delete(OriginalPath);
         }
 
+        /// <summary>
+        /// remove 'V2' from a str
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string RemoveV2(string str)
         {
             //delete v2 if the filename contains
@@ -210,6 +252,24 @@ namespace Common
             }
             return str;
         }
+
+        /// <summary>
+        /// change a sheet name from srcName to dstName
+        /// </summary>
+        /// <param name="sheet">it could be any sheet inside of the workbook</param> 
+        /// <param name="srcName"></param>
+        /// <param name="dstName"></param>
+        public static ISheet ChangeSheetName(ISheet sheet, string srcName, string dstName)
+        {
+            //get work book
+            IWorkbook workbook = sheet.Workbook;
+            //get sheet idx by original name
+            int idx = workbook.GetSheetIndex(srcName);
+            //set its name
+            workbook.SetSheetName(idx,dstName);
+            return workbook.GetSheetAt(idx);
+        }
+
     }
 }
 
