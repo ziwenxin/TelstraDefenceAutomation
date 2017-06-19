@@ -60,7 +60,8 @@ namespace BusinessObjects.MERIDIAN
         /// </summary>
         public void WaitForLoading()
         {
-
+            //wait 10 secs for the loading icon
+            Thread.Sleep(10000);
             //wait loading image disappears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(600));
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.XPath("/html/body/div[13]/img")));
@@ -173,8 +174,7 @@ namespace BusinessObjects.MERIDIAN
                 //save the report
                 try
                 {
-                    //try to avoid some exceptions
-                    SaveBtn.SendKeys(Keys.Enter);
+
                     SaveBtn.Click();
 
                 }

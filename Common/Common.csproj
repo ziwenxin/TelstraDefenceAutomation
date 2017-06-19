@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="OfficeExcel.cs" />
     <Compile Include="ExcelHelper.cs" />
+    <Compile Include="ProcessHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

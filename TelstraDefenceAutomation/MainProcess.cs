@@ -40,15 +40,16 @@ namespace TelstraDefenceAutomation
         private static ISheet configSheet;
         static void Main(string[] args)
         {
-
             #region MainProcess
             int retryTimes = 0;
             try
             {
                 //kill all the excel process
-                KillALLProcess("EXCEL");
+                ProcessHelper.KillAllProcess("EXCEL");
                 //read settings and set default download folder for chrome
                 configSheet = Intialization();
+                RunLavaStorm();
+
                 //get retry times
                 retryTimes = (int)configSheet.GetRow(21).GetCell(1).NumericCellValue;
 
@@ -129,6 +130,7 @@ namespace TelstraDefenceAutomation
             //new a process to open the file
             using (Process proc = new Process())
             {
+                Console.WriteLine("Start to run lavastorm...");
                 //set parameters
                 proc.StartInfo.FileName = "cmd.exe";
                 proc.StartInfo.UseShellExecute = false;
@@ -147,7 +149,10 @@ namespace TelstraDefenceAutomation
                 //exit
                 proc.StandardInput.WriteLine("exit");
                 //wait for the application appears
-                Thread.Sleep(30000);
+                //Thread.Sleep(60000);
+                //set focus on the window
+                ProcessHelper.SetFocusOnProcess("bre");
+
                 //input simulator
                 InputSimulator simulator = new InputSimulator();
                 //move the mouse
@@ -162,28 +167,20 @@ namespace TelstraDefenceAutomation
                 Thread.Sleep(1000);
                 simulator.Keyboard.KeyPress(VirtualKeyCode.F5);
                 //wait for running
-                Thread.Sleep(30000);
+                Thread.Sleep(60000);
+                //save the programs
+                simulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_S);
                 //kill the process
-                KillALLProcess("bre");
+                ProcessHelper.KillAllProcess("bre");
+                Console.WriteLine("Lavastrom runs completed");
             }
 
 
 
         }
 
-        /// <summary>
-        /// kill all the process with processName
-        /// </summary>
-        /// <param name="processName"></param>
-        private static void KillALLProcess(string processName)
-        {
-            //kill all the processes
-            foreach (Process process in Process.GetProcessesByName(processName))
-            {
-                process.Kill();
-            }
 
-        }
+        
 
         /// <summary>
         /// send a email to the address in config file, using the current outlook account
