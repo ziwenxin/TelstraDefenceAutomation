@@ -45,6 +45,7 @@ namespace BusinessObjects.SharePoint
             //get file full path
             string savePath = ConfigSheet.GetRow(5).GetCell(1).StringCellValue;
             string filename = ConfigSheet.GetRow(34).GetCell(1).StringCellValue;
+            savePath += "\\";
             filename += ".xlsx";
             //click save 
             RetryDownload(savePath+filename);
