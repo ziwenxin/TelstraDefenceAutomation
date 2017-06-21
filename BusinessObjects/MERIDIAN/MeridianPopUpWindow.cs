@@ -42,7 +42,7 @@ namespace BusinessObjects.MERIDIAN
             //wait for a while
             Thread.Sleep(1000);
             //click OK Button
-            clickOkBtn();
+            ClickOkBtn();
         }
         /// <summary>
         /// select the span of Account Detail and go to the detail page
@@ -57,7 +57,7 @@ namespace BusinessObjects.MERIDIAN
             //wait for a while
             Thread.Sleep(1000);
             //click OK Button
-            clickOkBtn();
+            ClickOkBtn();
         }
 
 

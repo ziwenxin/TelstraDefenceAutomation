@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Exceptions;
 using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
-using PropertyCollection;
 using OpenQA.Selenium.Support.UI;
+using PropertyCollection;
 
-namespace BusinessObjects
+namespace BusinessObjects.Toll
 {
     public class TollReportDownloadPage
     {
         //config sheet 
-        private ISheet configSheet;
+        private ISheet ConfigSheet;
 
         #region WebElements
 
@@ -35,15 +31,15 @@ namespace BusinessObjects
         /// <summary>
         /// initialize and set config sheet
         /// </summary>
-        /// <param name="Configsheet"></param>
-        public TollReportDownloadPage(ISheet Configsheet)
+        /// <param name="ConfigSheet"></param>
+        public TollReportDownloadPage(ISheet configSheet)
         {
-            //get configsheet and WebDriver.ChromeDriver
-            this.configSheet = Configsheet;
+            //get ConfigSheet and WebDriver.ChromeDriver
+            this.ConfigSheet = configSheet;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
             //find elements with the file names from config file
-            int totalDocuments = (int)configSheet.GetRow(6).GetCell(1).NumericCellValue;
+            int totalDocuments = (int)ConfigSheet.GetRow(6).GetCell(1).NumericCellValue;
             if (totalDocuments <= 0)
                 throw new NoReportsException();
             //switch to report frame
@@ -72,7 +68,7 @@ namespace BusinessObjects
         /// </summary>
         public void GoToReportPage()
         {
-            WebDriver.ChromeDriver.Navigate().GoToUrl(configSheet.GetRow(4).GetCell(1).StringCellValue);
+            WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(4).GetCell(1).StringCellValue);
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
@@ -86,7 +82,7 @@ namespace BusinessObjects
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(7).GetCell(1).StringCellValue + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigSheet.GetRow(7).GetCell(1).StringCellValue + "']")));
             //click the link
             GoodReportLink.Click();
             return new TollGoodReportPage();
@@ -99,7 +95,7 @@ namespace BusinessObjects
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(7).GetCell(2).StringCellValue + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigSheet.GetRow(7).GetCell(2).StringCellValue + "']")));
 
             //click the link
             ShipDetailLink.Click();
@@ -113,7 +109,7 @@ namespace BusinessObjects
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + configSheet.GetRow(7).GetCell(3).StringCellValue + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigSheet.GetRow(7).GetCell(3).StringCellValue + "']")));
 
             //click on the link
             SOHDetailLink.Click();

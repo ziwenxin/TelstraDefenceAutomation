@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessObjects;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using PropertyCollection;
 
-namespace BusinessObjects
+namespace BusinessObjects.Toll
 {
 
     public class TollSOHDetailPage : TollReportPage

@@ -77,7 +77,7 @@ namespace BusinessObjects.MERIDIAN
             //click add button
             AddBtn.Click();
             //click ok
-            clickOkBtn();
+            ClickOkBtn();
         }
 
     }

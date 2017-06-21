@@ -18,7 +18,7 @@ namespace BusinessObjects.SharePoint
         //config sheet
         private ISheet ConfigSheet { get; set; }
 
-        #region webElement
+        #region WebElement
         [FindsBy(How = How.XPath, Using = "//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img")]
         public IWebElement SaveIcon { get; set; } 
         #endregion

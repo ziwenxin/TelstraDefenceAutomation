@@ -1,26 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Exceptions;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
 using PropertyCollection;
 
-namespace BusinessObjects
+namespace BusinessObjects.Toll
 {
     public class TollLoginPage
     {
         //config sheet
-        private ISheet Configsheet;
+        private ISheet ConfigSheet;
 
         #region WebElements
         [FindsBy(How = How.Id, Using = "UserName")]
@@ -37,11 +28,11 @@ namespace BusinessObjects
         /// <summary>
         /// initialize and set config sheet
         /// </summary>
-        /// <param name="Configsheet"></param>
-        public TollLoginPage(ISheet Configsheet)
+        /// <param name="ConfigSheet"></param>
+        public TollLoginPage(ISheet configSheet)
         {
             //initialize
-            this.Configsheet = Configsheet;
+            this.ConfigSheet = configSheet;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
@@ -57,7 +48,7 @@ namespace BusinessObjects
             //wait for 2 secs 
             Thread.Sleep(2000);
             //launch the web
-            driver.Navigate().GoToUrl(Configsheet.GetRow(1).GetCell(1).StringCellValue);
+            driver.Navigate().GoToUrl(ConfigSheet.GetRow(1).GetCell(1).StringCellValue);
 
             //wait until the save icon exists
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
@@ -91,11 +82,11 @@ namespace BusinessObjects
 
 
             //enter the credentials
-            UserNameField.SendKeys(Configsheet.GetRow(2).GetCell(1).StringCellValue);
-            PasswordField.SendKeys(Configsheet.GetRow(3).GetCell(1).StringCellValue);
+            UserNameField.SendKeys(ConfigSheet.GetRow(2).GetCell(1).StringCellValue);
+            PasswordField.SendKeys(ConfigSheet.GetRow(3).GetCell(1).StringCellValue);
             //click login
             LoginBtn.Click();
-            return new TollReportDownloadPage(Configsheet);
+            return new TollReportDownloadPage(ConfigSheet);
         }
 
     }

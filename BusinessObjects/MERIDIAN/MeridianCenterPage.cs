@@ -38,7 +38,7 @@ namespace BusinessObjects.MERIDIAN
         /// <summary>
         /// click ok button to display the reports in the center main window
         /// </summary>
-        public void clickOkBtn()
+        public void ClickOkBtn()
         {
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriver.ChromeDriver.SwitchTo().Frame(OutterFrame);

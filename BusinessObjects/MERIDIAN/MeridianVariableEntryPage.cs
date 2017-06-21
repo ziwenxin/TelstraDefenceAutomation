@@ -14,7 +14,7 @@ namespace BusinessObjects.MERIDIAN
     public class MeridianVariableEntryPage : MeridianCenterPage
     {
         //config sheet
-        public ISheet ConfigSheet { get; set; }
+        private ISheet ConfigSheet { get; set; }
         #region WebElements
 
         [FindsBy(How = How.Id, Using = "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")]
@@ -93,7 +93,7 @@ namespace BusinessObjects.MERIDIAN
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id(frameId2)));
             WebDriver.ChromeDriver.SwitchTo().Frame(frame2);
         }
-        /// <summary>
+         /// <summary>
         /// the entry method of account detail
         /// </summary>
         /// <returns>account detail page</returns>

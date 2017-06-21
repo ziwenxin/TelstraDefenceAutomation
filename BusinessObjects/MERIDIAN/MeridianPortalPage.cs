@@ -16,7 +16,7 @@ namespace BusinessObjects.MERIDIAN
     public class MeridianPortalPage
     {
         //config sheet
-        public ISheet ConfigSheet { get; set; }
+        private ISheet ConfigSheet { get; set; }
 
 
         #region WebElements
