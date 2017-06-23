@@ -46,11 +46,11 @@ namespace BusinessObjects.MERIDIAN
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(30));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("SELECTOR_mainctrl_componentListControl_unid19_tv")));
 
-            //click select all
+            //click the first row
             DateRow.Click();
             Thread.Sleep(500);
 
-            //remove all
+            //remove first row
             RemoveBtn.Click();
             Thread.Sleep(500);
 

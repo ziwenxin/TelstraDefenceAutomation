@@ -44,7 +44,7 @@ namespace BusinessObjects.SharePoint
 
             //get file full path
             string savePath = ConfigSheet.GetRow(5).GetCell(1).StringCellValue;
-            string filename = ConfigSheet.GetRow(34).GetCell(1).StringCellValue;
+            string filename = ConfigSheet.GetRow(37).GetCell(1).StringCellValue;
             savePath += "\\";
             filename += ".xlsx";
             //click save 
@@ -86,7 +86,7 @@ namespace BusinessObjects.SharePoint
         private void GoToMainPage()
         {
             //go to share point page
-            string URL = ConfigSheet.GetRow(33).GetCell(1).StringCellValue;
+            string URL = ConfigSheet.GetRow(36).GetCell(1).StringCellValue;
             WebDriver.ChromeDriver.Navigate().GoToUrl(URL);
         }
 
