@@ -34,7 +34,7 @@ namespace BusinessObjects.Toll
         {
             IWebDriver driver = WebDriver.ChromeDriver;
             //wait for the page loaded
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(120));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(300));
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ReportViewer1_ctl04_ctl00")));
             //add filter and generate the report
             AddFilter();

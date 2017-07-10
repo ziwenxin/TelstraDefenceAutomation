@@ -16,7 +16,7 @@ namespace BusinessObjects.MERIDIAN
     public class MeridianPortalPage
     {
         //config sheet
-        private ISheet ConfigSheet { get; set; }
+        private Dictionary<string, string> ConfigDic { get; set; }
 
 
         #region WebElements
@@ -24,9 +24,9 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement MeridianLaunchImg { get; set; } 
         #endregion
 
-        public MeridianPortalPage(ISheet configSheet)
+        public MeridianPortalPage(Dictionary<string,string> configDic)
         {
-            ConfigSheet = configSheet;
+            ConfigDic = configDic;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
         }
@@ -44,7 +44,7 @@ namespace BusinessObjects.MERIDIAN
                 try
                 {
                     //go to launch url
-                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigSheet.GetRow(10).GetCell(1).StringCellValue);
+                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigDic["MeridianPortalURL"]);
                     //wait for the image appears
                     WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
                     wait.Until(ExpectedConditions.ElementIsVisible(By.Id("2406890")));

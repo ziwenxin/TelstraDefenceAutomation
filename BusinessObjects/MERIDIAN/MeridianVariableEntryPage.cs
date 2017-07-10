@@ -14,7 +14,7 @@ namespace BusinessObjects.MERIDIAN
     public class MeridianVariableEntryPage : MeridianCenterPage
     {
         //config sheet
-        private ISheet ConfigSheet { get; set; }
+        private Dictionary<string, string> ConfigDIc { get; set; }
         #region WebElements
 
         [FindsBy(How = How.Id, Using = "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")]
@@ -32,9 +32,9 @@ namespace BusinessObjects.MERIDIAN
         /// initial web element and set config sheet
         /// </summary>
         /// <param name="configSheet"></param>
-        public MeridianVariableEntryPage(ISheet configSheet)
+        public MeridianVariableEntryPage(Dictionary<string,string> configDic)
         {
-            ConfigSheet = configSheet;
+            ConfigDIc = configDic;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
@@ -68,7 +68,7 @@ namespace BusinessObjects.MERIDIAN
 
 
             //get code from config file
-            string code = ConfigSheet.GetRow(11).GetCell(1).StringCellValue;
+            string code = ConfigDIc["TelstraProfitCentres"];
             //wait for the input field
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id(inputId)));
             //input

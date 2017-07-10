@@ -37,16 +37,16 @@ namespace TelstraDefenceAutomation
 {
     public class MainProcess
     {
-
+        //dictionary to store all the config data
+        private static Dictionary<string, string> _configDic;
         //log string
         private static StringBuilder sb = new StringBuilder();
         //static member to store config file
-        private static ISheet configSheet;
         static void Main(string[] args)
         {
             #region MainProcess
             int retryTimes = 0;
-
+            ISheet configSheet = null;
             try
             {
                 //kill all the excel process
@@ -56,10 +56,10 @@ namespace TelstraDefenceAutomation
 
 
                 //get retry times
-                retryTimes = (int)configSheet.GetRow(24).GetCell(1).NumericCellValue;
+                retryTimes = int.Parse(_configDic["RerunTimes"]);
 
                 //before automation, delete all files in the save folder
-                DeleteAllFiles(configSheet.GetRow(5).GetCell(1).StringCellValue);
+                DeleteAllFiles(_configDic["LocalSavePath"]);
 
                 //download excel files
                 DownLoadTollDocuments();
@@ -77,16 +77,19 @@ namespace TelstraDefenceAutomation
                 UploadFiles();
 
                 //run lavastorm program
-                if (configSheet.GetRow(41).GetCell(1).StringCellValue.ToLower() == "yes")
+                if (_configDic["EnableAutomation?"].ToLower() == "yes")
                 {
                     AddToLog("Start to run lavastorm...");
-                    CmdHelper.RunLavaStorm(configSheet);
+                    CmdHelper.RunLavaStorm(_configDic);
                     AddToLog("Lavastrom runs completed");
                 }
 
                 //renew retry times
                 retryTimes = 3;
 
+                //send email
+                string subject = "Automation Success";
+                SendEmail(subject,"The automation runs successfully on "+DateTime.Now);
             }
             catch (Exception e)
             {
@@ -100,16 +103,32 @@ namespace TelstraDefenceAutomation
                 //notify admin
                 else
                 {
+
                     //reset retry times
                     retryTimes = 3;
-                    //set content
-                    string content = "Hello," + Environment.NewLine + Environment.NewLine + "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." + Environment.NewLine + Environment.NewLine +
-                                     "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." + Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" + Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" + autoPath + "' to run TelstraDefenceAutomation.exe manually from its saved location)" + Environment.NewLine + "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." + Environment.NewLine + Environment.NewLine +
-                                     "The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" + Environment.NewLine +
-                                     Environment.NewLine + "Thank you for helping me complete my run," + Environment.NewLine +
+                    //set content and subject
+                    string autoPath = _configDic["AutomationPath"];
+                    string subject = "Automation Rerun Failed";
+                    string content = "Hello," + Environment.NewLine + Environment.NewLine +
+                                     "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." +
+                                     Environment.NewLine + Environment.NewLine +
+                                     "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." +
+                                     Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" +
+                                     Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" +
+                                     autoPath +
+                                     "' to run TelstraDefenceAutomation.exe manually from its saved location)" +
+                                     Environment.NewLine +
+                                     "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." +
+                                     Environment.NewLine + Environment.NewLine +
+                                     "The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" +
+                                     Environment.NewLine +
+                                     Environment.NewLine + "Thank you for helping me complete my run," +
+                                     Environment.NewLine +
                                      "The Defence Inventory Data Hub bot";
-                    SendEmail(content);
+                    SendEmail(subject, content);
                 }
+
+
                 //log
                 AddToLog(e.ToString());
             }
@@ -153,17 +172,49 @@ namespace TelstraDefenceAutomation
         /// </summary>
         private static void StoreIntoDic(ISheet configSheet)
         {
-            
+            //initial
+            _configDic = new Dictionary<string, string>();
+            //read line by line
+            for (int i = 0; i <= configSheet.LastRowNum; i++)
+            {
+
+                //read data in a row
+                int value_idx = 1;
+                while (configSheet.GetRow(i).GetCell(value_idx) != null && configSheet.GetRow(i).GetCell(value_idx).CellType != CellType.Blank)
+                {
+                    //get name
+                    string name = configSheet.GetRow(i).GetCell(0).StringCellValue;
+                    //if the row contains multiple data, name the key with idx
+                    if (configSheet.GetRow(i).GetCell(2) != null && configSheet.GetRow(i).GetCell(2).CellType != CellType.Blank)
+                        name += value_idx;
+                    //if its not string, then convert it to string
+                    string value = "";
+                    try
+                    {
+                        value = configSheet.GetRow(i).GetCell(value_idx).StringCellValue;
+
+                    }
+                    catch (Exception e)
+                    {
+                        value = configSheet.GetRow(i).GetCell(value_idx).NumericCellValue.ToString();
+                    }
+                    value_idx++;
+                    //add it to the config dic
+                    _configDic.Add(name, value);
+                }
+
+
+            }
         }
         /// <summary>
         /// send a email to the address in config file, using the current outlook account
         /// </summary>
-        private static void SendEmail(string content)
+        private static void SendEmail(string subject, string content)
         {
             //set address, subject and body of email
-            string emailAddr = configSheet.GetRow(25).GetCell(1).StringCellValue;
-            string subject = "Automation Rerun Failed";
-            string autoPath = configSheet.GetRow(22).GetCell(1).StringCellValue;
+            string emailAddr = _configDic["NotificationEmail"];
+
+            string autoPath = _configDic["AutomationPath"];
             string body = content;
 
             //set up a mail
@@ -193,12 +244,12 @@ namespace TelstraDefenceAutomation
         {
             AddToLog("Downloading from share point...");
             //download file from share point
-            SharePointPage sharePointPage = new SharePointPage(configSheet);
+            SharePointPage sharePointPage = new SharePointPage(_configDic);
             sharePointPage.DownLoadSharePointDoc();
             //change 1 sheet name from BV & SA to BVSA
             //get path and filename
-            string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-            string filename = configSheet.GetRow(37).GetCell(1).StringCellValue;
+            string savepath = _configDic["LocalSavePath"];
+            string filename = _configDic["SharepointFileName"];
             savepath += "\\";
             //set sheet name
             OfficeExcel.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
@@ -214,13 +265,13 @@ namespace TelstraDefenceAutomation
             AddToLog("Downloading files from share folder...");
 
             //get username and password
-            string username = configSheet.GetRow(27).GetCell(1).StringCellValue;
-            string password = configSheet.GetRow(28).GetCell(1).StringCellValue;
+            string username = _configDic["ShareFolderUserName"];
+            string password = _configDic["ShareFolderPassword"];
             //get local save path and server path
-            string localPath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-            string serverPath = configSheet.GetRow(29).GetCell(1).StringCellValue;
+            string localPath = _configDic["LocalSavePath"];
+            string serverPath = _configDic["LogSchedulePath"];
             //get filename
-            string filename = configSheet.GetRow(30).GetCell(1).StringCellValue;
+            string filename = _configDic["LogScheduleFileName"];
             localPath += "\\";
             //launch a command line to connect to the server
             CmdHelper.ConnectState(serverPath, username, password);
@@ -231,15 +282,15 @@ namespace TelstraDefenceAutomation
             File.Copy(serverPath + filename, localPath + filename, true);
             AddToLog(filename + " download completed");
             //copy Burwood stock transfer file
-            serverPath = configSheet.GetRow(31).GetCell(1).StringCellValue + "\\";
-            filename = configSheet.GetRow(32).GetCell(1).StringCellValue;
+            serverPath = _configDic["BurwoodPath"] + "\\";
+            filename = _configDic["BurwoodFileName"];
             filename = GetNewestFileName(serverPath, filename);
             File.Copy(serverPath + filename, localPath + filename, true);
             AddToLog(filename + " download completed");
 
             //copy Regents transfer stock file
-            serverPath = configSheet.GetRow(33).GetCell(1).StringCellValue + "\\";
-            filename = configSheet.GetRow(34).GetCell(1).StringCellValue;
+            serverPath = _configDic["RegentsPath"] + "\\";
+            filename = _configDic["RegentsFileName"];
             filename = GetNewestFileName(serverPath, filename);
             File.Copy(serverPath + filename, localPath + filename, true);
             AddToLog(filename + " download completed");
@@ -255,10 +306,10 @@ namespace TelstraDefenceAutomation
             SessionOptions options = new SessionOptions
             {
                 Protocol = Protocol.Sftp,
-                HostName = configSheet.GetRow(16).GetCell(1).StringCellValue,
-                UserName = configSheet.GetRow(17).GetCell(1).StringCellValue,
-                Password = configSheet.GetRow(18).GetCell(1).StringCellValue,
-                SshHostKeyFingerprint = configSheet.GetRow(19).GetCell(1).StringCellValue,
+                HostName = _configDic["HostName"],
+                UserName = _configDic["WinScpUsername"],
+                Password = _configDic["WinScpPassword"],
+                SshHostKeyFingerprint = _configDic["FingerPrint"],
             };
 
             using (Session session = new Session())
@@ -271,8 +322,8 @@ namespace TelstraDefenceAutomation
                 transferOptions.TransferMode = TransferMode.Binary;
 
                 //get path
-                string localPath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                string remotePath = configSheet.GetRow(20).GetCell(1).StringCellValue;
+                string localPath = _configDic["LocalSavePath"];
+                string remotePath = _configDic["RemoteSavePath"];
                 localPath += "\\";
                 //change the '/' to '\'
                 localPath = localPath.Replace("/", "\\");
@@ -311,12 +362,12 @@ namespace TelstraDefenceAutomation
         {
             //get total toll report numbers
             int totalWaitMilliSecs = 0;
-            int totalReportNum = (int)configSheet.GetRow(6).GetCell(1).NumericCellValue;
+            int totalReportNum = int.Parse(_configDic["TotalTollDocuments"]);
             for (int i = 0; i < totalReportNum; i++)
             {
                 //read from report
-                string savePath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                string filename = configSheet.GetRow(7).GetCell(1 + i).StringCellValue;
+                string savePath = _configDic["LocalSavePath"];
+                string filename = _configDic["TollDocumentName" + (i + 1)];
                 savePath += "\\";
                 string filepath = savePath + filename;
                 //check if the file exists
@@ -327,13 +378,13 @@ namespace TelstraDefenceAutomation
                     if (!File.Exists(filepath + ".xls"))
                         throw new Exception(filepath + " is not downloaded");
                 }
-                int linesToBeDeleted = (int)configSheet.GetRow(8).GetCell(1 + i).NumericCellValue;
+                int linesToBeDeleted = int.Parse(_configDic["LinesToBeDeleted" + (i + 1)]);
 
                 //use library to read an excel file
                 ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
 
                 //do the archive
-                ExcelHelper.MoveFileToArchive(savePath, filename, ".xlsx");
+                ExcelHelper.MoveFileToArchive(savePath, filename, true);
                 //save
                 ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
                 AddToLog(filename + " process completed");
@@ -347,15 +398,15 @@ namespace TelstraDefenceAutomation
         {
             //get total meridian report numbers
             int totalWaitMilliSecs = 0;
-            int totalReportNum = (int)configSheet.GetRow(12).GetCell(1).NumericCellValue;
+            int totalReportNum = int.Parse(_configDic["TotalMeridianDocuments"]);
             for (int i = 0; i < totalReportNum; i++)
             {
                 //read from report
-                string savePath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                string filename = configSheet.GetRow(13).GetCell(1 + i).StringCellValue;
+                string savePath = _configDic["LocalSavePath"];
+                string filename = _configDic["OriginalFileName" + (i + 1)];
                 savePath += "\\";
                 string filepath = savePath + filename;
-                string rename = configSheet.GetRow(14).GetCell(1 + i).StringCellValue;
+                string rename = _configDic["Rename" + (i + 1)];
                 string extension = ".xls";
                 //check if the file exists
                 if (!File.Exists(filepath + extension))
@@ -367,9 +418,11 @@ namespace TelstraDefenceAutomation
                 ExcelHelper.ProcessInvalidExcel(savePath, filename, rename);
                 //save the incorrupted file as xlsx
                 OfficeExcel.SaveAs(savePath, rename);
+                ExcelHelper.MoveFileToArchive(savePath,rename,false);
                 //delete he priginal file
                 if (File.Exists(savePath + rename + ".xls"))
                     File.Delete(savePath + rename + ".xls");
+                AddToLog(rename + "process completed");
             }
 
         }
@@ -404,9 +457,8 @@ namespace TelstraDefenceAutomation
             int retryCount = 3;
             //read data and stores it into a dictionary
             ISheet sheet = ExcelHelper.ReadExcel("Defense Automation Config.xlsx");
-            Dictionary<string,string> configDic=new Dictionary<string, string>();
             //check if the download folder exists, if not create one
-            configDic.Add();
+            StoreIntoDic(sheet);
             string path = sheet.GetRow(5).GetCell(1).StringCellValue;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -446,18 +498,18 @@ namespace TelstraDefenceAutomation
             //login
             try
             {
-                TollLoginPage tollLoginPage = new TollLoginPage(configSheet);
+                TollLoginPage tollLoginPage = new TollLoginPage(_configDic);
                 TollReportDownloadPage tollDownloadPage = tollLoginPage.Login();
-                string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+                string savepath = _configDic["LocalSavePath"];
                 savepath += "\\";
                 //download first document
-                string filename = configSheet.GetRow(7).GetCell(1).StringCellValue;
+                string filename = _configDic["TollDocumentName1"];
                 TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
                 tollGoodReportPage.DownLoadReport(savepath + filename);
 
                 AddToLog(filename + " download completed");
                 //download 2nd
-                filename = configSheet.GetRow(7).GetCell(2).StringCellValue;
+                filename = _configDic["TollDocumentName2"];
                 tollDownloadPage.GoToReportPage();
                 TollShipOrderPage tollShipDetailPage = tollDownloadPage.DownLoadShipOrder();
                 tollShipDetailPage.DownLoadReport(savepath + filename);
@@ -465,7 +517,7 @@ namespace TelstraDefenceAutomation
                 AddToLog(filename + " download completed");
 
                 //download the 3rd 
-                filename = configSheet.GetRow(7).GetCell(3).StringCellValue;
+                filename = _configDic["TollDocumentName3"];
                 tollDownloadPage.GoToReportPage();
                 TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
                 tollSohDetailPage.DownLoadReport(savepath + filename);
@@ -492,7 +544,7 @@ namespace TelstraDefenceAutomation
         {
             AddToLog("Downloading Meridian documents...");
             //go to the portal of meridian
-            MeridianPortalPage meridianPortalPage = new MeridianPortalPage(configSheet);
+            MeridianPortalPage meridianPortalPage = new MeridianPortalPage(_configDic);
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
 
             //download files
@@ -502,15 +554,15 @@ namespace TelstraDefenceAutomation
             {
                 try
                 {
-                    DownLoadPODetailDoc(configSheet, meridianNavigationPage);
+                    DownLoadPODetailDoc(meridianNavigationPage);
                     break;
                 }
                 catch (Exception e)
                 {
                     AddToLog("Retry Po Detail Download for " + (3 - retryCount) + " times");
                     //if file exists, delete it
-                    string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                    string filename = configSheet.GetRow(13).GetCell(1).StringCellValue;
+                    string savepath = _configDic["LocalSavePath"];
+                    string filename = _configDic["OriginalFileName1"];
                     savepath += "\\";
                     DeleteFile(savepath, filename);
                     if (retryCount <= 0)
@@ -526,16 +578,15 @@ namespace TelstraDefenceAutomation
             {
                 try
                 {
-                    DownLoadAccDetailDoc(configSheet, meridianNavigationPage);
+                    DownLoadAccDetailDoc(meridianNavigationPage);
                     break;
                 }
                 catch (Exception e)
                 {
                     AddToLog("Retry Account Detail Download for " + (3 - retryCount) + " times");
                     //if file exists, delete it
-                    string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
-                    string filename = configSheet.GetRow(13).GetCell(2).StringCellValue;
-                    DeleteFile(savepath, filename);
+                    string savepath = _configDic["LocalSavePath"];
+                    string filename = _configDic["OriginalFileName2"];
                     if (retryCount <= 0)
                         throw e;
                     retryCount--;
@@ -552,17 +603,17 @@ namespace TelstraDefenceAutomation
         /// </summary>
         /// <param name="configSheet"></param>
         /// <param name="meridianNavigationPage"></param>
-        private static void DownLoadAccDetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
+        private static void DownLoadAccDetailDoc(MeridianNavigationPage meridianNavigationPage)
         {
             //go to account payable entry detail page
-            MeridianVariableEntryPage accVariableEntryPage = meridianNavigationPage.GotoAccountDetailEntryPage(configSheet);
+            MeridianVariableEntryPage accVariableEntryPage = meridianNavigationPage.GotoAccountDetailEntryPage(_configDic);
             MeridianAccountDetailPage accountDetailPage = accVariableEntryPage.AccountEnter();
             ////click open button select detail
             MeridianPopUpWindow accPopUpWindow = accountDetailPage.OpenPoPUpWindow();
             accPopUpWindow.SelectAccountDetailDoc();
             //get full path
-            string filename = configSheet.GetRow(13).GetCell(2).StringCellValue;
-            string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+            string filename = _configDic["OriginalFileName2"];
+            string savepath = _configDic["LocalSavePath"];
             savepath += "\\";
 
             ////download PO Detail Reprrt
@@ -576,19 +627,19 @@ namespace TelstraDefenceAutomation
         /// </summary>
         /// <param name="configSheet"></param>
         /// <param name="meridianNavigationPage"></param>
-        private static void DownLoadPODetailDoc(ISheet configSheet, MeridianNavigationPage meridianNavigationPage)
+        private static void DownLoadPODetailDoc(MeridianNavigationPage meridianNavigationPage)
         {
             //go to PO detail
-            MeridianVariableEntryPage POVariableEntryPage = meridianNavigationPage.GotoPoDetailEntryPage(configSheet);
+            MeridianVariableEntryPage POVariableEntryPage = meridianNavigationPage.GotoPoDetailEntryPage(_configDic);
             MeridianAccountDetailPage PoAccountDetailPage = POVariableEntryPage.PODetailEnter();
             //click open button select detail
             MeridianPopUpWindow POPopUpWindow = PoAccountDetailPage.OpenPoPUpWindow();
             POPopUpWindow.SelectPODetailDoc();
             //get full path
-            string filename = configSheet.GetRow(13).GetCell(1).StringCellValue;
-            string savepath = configSheet.GetRow(5).GetCell(1).StringCellValue;
+            string filename = _configDic["OriginalFileName1"];
+            string savepath = _configDic["LocalSavePath"];
             savepath += "\\";
-            //download PO Detail Reprrt
+            //download PO Detail Report
             PoAccountDetailPage.DownLoadPoDetailDoc(savepath + filename);
 
             AddToLog(filename + " download completed");
@@ -614,7 +665,7 @@ namespace TelstraDefenceAutomation
                 td.Triggers.Add(new TimeTrigger { EndBoundary = DateTime.Now.AddMinutes(2) });
                 td.Triggers.Add(new TimeTrigger(DateTime.Now.AddMinutes(1)));
                 //get automation path
-                string autoPath = configSheet.GetRow(22).GetCell(1).StringCellValue;
+                string autoPath = _configDic["AutomationPath"];
                 autoPath += "\\";
 
                 //create an action
@@ -678,7 +729,7 @@ namespace TelstraDefenceAutomation
         private static void WriteLogFile()
         {
             //get path and file name
-            string path = configSheet.GetRow(23).GetCell(1).StringCellValue;
+            string path = _configDic["LogPath"];
             //create folder
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);

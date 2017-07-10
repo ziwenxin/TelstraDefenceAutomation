@@ -16,7 +16,7 @@ namespace BusinessObjects.SharePoint
     public class SharePointPage
     {
         //config sheet
-        private ISheet ConfigSheet { get; set; }
+        private Dictionary<string,string> ConfigDic { get; set; }
 
         #region WebElement
         [FindsBy(How = How.XPath, Using = "//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img")]
@@ -27,9 +27,9 @@ namespace BusinessObjects.SharePoint
         ///  initialize and set config sheet
         /// </summary>
         /// <param name="configSheet"></param>
-        public SharePointPage(ISheet configSheet)
+        public SharePointPage(Dictionary<string,string> configDic)
         {
-            ConfigSheet = configSheet;
+            ConfigDic = configDic;
             PageFactory.InitElements(WebDriver.ChromeDriver,this);
         }
 
@@ -43,8 +43,8 @@ namespace BusinessObjects.SharePoint
            
 
             //get file full path
-            string savePath = ConfigSheet.GetRow(5).GetCell(1).StringCellValue;
-            string filename = ConfigSheet.GetRow(37).GetCell(1).StringCellValue;
+            string savePath = ConfigDic["LocalSavePath"];
+            string filename = ConfigDic["SharepointFileName"];
             savePath += "\\";
             filename += ".xlsx";
             //click save 
@@ -86,7 +86,7 @@ namespace BusinessObjects.SharePoint
         private void GoToMainPage()
         {
             //go to share point page
-            string URL = ConfigSheet.GetRow(36).GetCell(1).StringCellValue;
+            string URL = ConfigDic["SharepointURL"];
             WebDriver.ChromeDriver.Navigate().GoToUrl(URL);
         }
 
