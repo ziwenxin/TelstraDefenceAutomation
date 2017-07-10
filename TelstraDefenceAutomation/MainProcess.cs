@@ -102,7 +102,13 @@ namespace TelstraDefenceAutomation
                 {
                     //reset retry times
                     retryTimes = 3;
-                    SendEmail();
+                    //set content
+                    string content = "Hello," + Environment.NewLine + Environment.NewLine + "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." + Environment.NewLine + Environment.NewLine +
+                                     "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." + Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" + Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" + autoPath + "' to run TelstraDefenceAutomation.exe manually from its saved location)" + Environment.NewLine + "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." + Environment.NewLine + Environment.NewLine +
+                                     "The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" + Environment.NewLine +
+                                     Environment.NewLine + "Thank you for helping me complete my run," + Environment.NewLine +
+                                     "The Defence Inventory Data Hub bot";
+                    SendEmail(content);
                 }
                 //log
                 AddToLog(e.ToString());
@@ -142,22 +148,23 @@ namespace TelstraDefenceAutomation
         }
 
 
-
-
+        /// <summary>
+        /// it will read data from config sheet to a dictionary
+        /// </summary>
+        private static void StoreIntoDic(ISheet configSheet)
+        {
+            
+        }
         /// <summary>
         /// send a email to the address in config file, using the current outlook account
         /// </summary>
-        private static void SendEmail()
+        private static void SendEmail(string content)
         {
             //set address, subject and body of email
             string emailAddr = configSheet.GetRow(25).GetCell(1).StringCellValue;
             string subject = "Automation Rerun Failed";
             string autoPath = configSheet.GetRow(22).GetCell(1).StringCellValue;
-            string body = "Hello," + Environment.NewLine + Environment.NewLine + "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." + Environment.NewLine + Environment.NewLine +
-                "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." + Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" + Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" + autoPath + "' to run TelstraDefenceAutomation.exe manually from its saved location)" + Environment.NewLine + "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." + Environment.NewLine + Environment.NewLine +
-                 "The user handbook file is: Telstra Defence Atuomation User Handbook v1.*.*.docx" + Environment.NewLine +
-                    Environment.NewLine + "Thank you for helping me complete my run," + Environment.NewLine +
-                "The Defence Inventory Data Hub bot";
+            string body = content;
 
             //set up a mail
             Application app = new Application();
@@ -395,10 +402,11 @@ namespace TelstraDefenceAutomation
             AddToLog("Inialising...");
 
             int retryCount = 3;
-            //read data
+            //read data and stores it into a dictionary
             ISheet sheet = ExcelHelper.ReadExcel("Defense Automation Config.xlsx");
-
+            Dictionary<string,string> configDic=new Dictionary<string, string>();
             //check if the download folder exists, if not create one
+            configDic.Add();
             string path = sheet.GetRow(5).GetCell(1).StringCellValue;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
