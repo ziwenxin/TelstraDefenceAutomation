@@ -39,7 +39,7 @@ namespace BusinessObjects.MERIDIAN
         /// <summary>
         /// Enter the detail and go to PO detail page
         /// </summary>
-        /// <param name="configSheet"></param>
+        /// <param name="configDic"></param>
         /// <returns>an object of variable entry page</returns>
         public MeridianVariableEntryPage GotoPoDetailEntryPage(Dictionary<string,string> configDic)
         {
@@ -62,7 +62,7 @@ namespace BusinessObjects.MERIDIAN
         /// <summary>
         /// Enter the detail and go to Account detail page
         /// </summary>
-        /// <param name="configSheet"></param>
+        /// <param name="configDic"></param>
         /// <returns>an object of variable entry page</returns>
         public MeridianVariableEntryPage GotoAccountDetailEntryPage(Dictionary<string,string> configDic)
         {

@@ -74,7 +74,7 @@ namespace BusinessObjects.MERIDIAN
         /// find the date filter and click the 'edit' link
         /// </summary>
         /// <returns>an object of date filter window</returns>
-        public MeridianAccDetailFilterWindow AddFilter()
+        public MeridianDateFilterWindow AddFilter()
         {
             //wait drop list clickable
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(300));
@@ -98,8 +98,10 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().Frame(PopUpFrame);
             //wait for the pop up window completed
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("SELECTOR_mainctrl_removeButton")));
-            return new MeridianAccDetailFilterWindow();
+            return new MeridianDateFilterWindow();
         }
+
+  
 
         /// <summary>
         /// download PO Detail Document
@@ -111,8 +113,21 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             WebDriver.ChromeDriver.SwitchTo().Frame(PODetailInputFrame);
+
             //wait for loading
             WaitForLoading();
+
+            //add filter
+            MeridianDateFilterWindow meridianAccDetailFilterWindow = AddFilter(); meridianAccDetailFilterWindow.AddFilter();
+            //wait for a while
+            Thread.Sleep(1000);
+            //switch back 
+            //wait generation of the report
+            WebDriver.ChromeDriver.SwitchTo().DefaultContent();
+            WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
+            WebDriver.ChromeDriver.SwitchTo().Frame(PODetailInputFrame);
+
+
 
 
             //dowloading the file
@@ -137,8 +152,7 @@ namespace BusinessObjects.MERIDIAN
             WaitForLoading();
 
             //save the report
-            MeridianAccDetailFilterWindow meridianAccDetailFilterWindow = AddFilter();
-            meridianAccDetailFilterWindow.AddFilter();
+            MeridianDateFilterWindow meridianAccDetailFilterWindow = AddFilter();            meridianAccDetailFilterWindow.AddFilter();
             //wait for a while
             Thread.Sleep(1000);
             //switch back 

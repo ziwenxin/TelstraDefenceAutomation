@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
@@ -24,14 +20,14 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement AccountTelProfitCenterField { get; set; }
 
         [FindsBy(How = How.Id, Using = "DLG_VARIABLE_dlgBase_BTNOK")]
-        public IWebElement OKBtn { get; set; } 
+        public IWebElement OKBtn { get; set; }
         #endregion
 
 
         /// <summary>
         /// initial web element and set config sheet
         /// </summary>
-        /// <param name="configSheet"></param>
+        /// <param name="configDic"></param>
         public MeridianVariableEntryPage(Dictionary<string,string> configDic)
         {
             ConfigDIc = configDic;
@@ -55,10 +51,10 @@ namespace BusinessObjects.MERIDIAN
         /// enter variable into the variable page
         /// </summary>
         /// <param name="inputField">the filed element to be inputed in</param>
-        /// <param name="inputframe"></param>
-        /// <param name="inputId"></param>
-        /// <param name="frameId"></param>
-        /// <returns>an object of account detial page</returns>
+        /// <param name="inputframe">the frame of input field</param>
+        /// <param name="inputId">the id of input field</param>
+        /// <param name="frameId">the id of the input frame</param>
+        /// <returns>an object of account detail page</returns>
         private MeridianAccountDetailPage EnterVarible(IWebElement inputField,IWebElement inputframe,string inputId,string frameId)
         {
             //switch to certain frame
@@ -80,18 +76,24 @@ namespace BusinessObjects.MERIDIAN
             return new MeridianAccountDetailPage();
         }
 
-        private void SwitchToFrame(string frameId1,string frameId2,IWebElement frame2)
+        /// <summary>
+        /// switch current frame to another frame
+        /// </summary>
+        /// <param name="centerFrameId"></param>
+        /// <param name="newFrameId"></param>
+        /// <param name="newFrame"></param>
+        private void SwitchToFrame(string centerFrameId, string newFrameId, IWebElement newFrame)
         {
             //switch to correct frame
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(120));
 
-            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(frameId1)));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(centerFrameId)));
             //switch to sub frame
             WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             //wait centre frame
-            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(frameId2)));
-            WebDriver.ChromeDriver.SwitchTo().Frame(frame2);
+            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(newFrameId)));
+            WebDriver.ChromeDriver.SwitchTo().Frame(newFrame);
         }
          /// <summary>
         /// the entry method of account detail

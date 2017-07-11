@@ -18,7 +18,7 @@ namespace Common
         /// read an excel
         /// </summary>
         /// <param name="filepath"></param>
-        /// <returns></returns>
+        /// <returns>the data sheet</returns>
         public static ISheet ReadExcel(string filepath)
         {
             using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
@@ -33,8 +33,8 @@ namespace Common
         /// <summary>
         /// delete a number of rows from a sheet
         /// </summary>
-        /// <param name="sheet"></param>
-        /// <param name="num"></param>
+        /// <param name="sheet">the sheet needed to be change</param>
+        /// <param name="num">the number needed to delete</param>
         public static void DeleteRows(ISheet sheet, int num)
         {
 
@@ -51,19 +51,19 @@ namespace Common
         /// <summary>
         /// save a file to another path, delete several lines in it
         /// </summary>
-        /// <param name="sheet"></param>
+        /// <param name="sheet">the save sheet</param>
         /// <param name="path"></param>
-        /// <param name="linesToBeDeleted"></param>
+        /// <param name="linesToBeDeleted">the number of rows needs to be deleted</param>
         public static void SaveTo(ISheet sheet, string path, int linesToBeDeleted)
         {
-            path = RemoveV2(path);
+            path = FileHelper.RemoveV2(path);
 
             using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
             {
 
                 //create a new work book with the same sheet name
                 XSSFWorkbook saveWorkbook = new XSSFWorkbook();
-                saveWorkbook.CreateSheet(RemoveV2(sheet.SheetName));
+                saveWorkbook.CreateSheet(FileHelper.RemoveV2(sheet.SheetName));
                 ISheet newSheet = saveWorkbook.GetSheetAt(0);
 
                 //copy data row by row
@@ -89,7 +89,7 @@ namespace Common
         /// <summary>
         /// save a excel file
         /// </summary>
-        /// <param name="sheet"></param>
+        /// <param name="sheet">the save sheet</param>
         /// <param name="filename"></param>
         public static void Save(ISheet sheet,string filename)
         {
@@ -154,7 +154,7 @@ namespace Common
                 newCell.SetCellFormula(srcCell.CellFormula);
             }
             else
-            { // nothing29
+            { // nothing
             }
         }
 
@@ -162,7 +162,7 @@ namespace Common
         /// process the corrupted file and rename it
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="filename"></param>
+        /// <param name="filename">original name</param>
         /// <param name="rename"></param>
         public static void ProcessInvalidExcel(string path, string filename,string rename)
         {

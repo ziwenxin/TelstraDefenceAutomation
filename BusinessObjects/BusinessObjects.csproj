@@ -74,7 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MERIDIAN\MeridianAccDetailFilterWindow.cs" />
+    <Compile Include="MERIDIAN\MeridianDateFilterWindow.cs" />
     <Compile Include="MERIDIAN\MeridianCenterPage.cs" />
     <Compile Include="MERIDIAN\MeridianNavigationPage.cs" />
     <Compile Include="MERIDIAN\MeridianAccountDetailPage.cs" />

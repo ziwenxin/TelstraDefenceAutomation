@@ -16,6 +16,7 @@ namespace Common
         /// <summary>
         /// run lavastrom to process the excel files in the server side
         /// </summary>
+        /// <param name="configDic"></param>
         public static void RunLavaStorm(Dictionary<string,string> configDic)
         {
             //new a process to open the file
@@ -41,7 +42,7 @@ namespace Common
                 proc.StandardInput.WriteLine("exit");
                 //wait for the application appears
 
-                Thread.Sleep(120000);
+                Thread.Sleep(60000);
                 //set focus on the window
                 ProcessHelper.SetFocusOnProcess("bre");
                 Thread.Sleep(5000);
@@ -63,7 +64,7 @@ namespace Common
                 simulator.Mouse.LeftButtonClick();
 
                 //wait for running
-                Thread.Sleep(120000);
+                Thread.Sleep(300000);
                 //save the programs
                 simulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_S);
                 Thread.Sleep(3000);

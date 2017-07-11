@@ -11,7 +11,7 @@ using PropertyCollection;
 
 namespace BusinessObjects.MERIDIAN
 {
-    public class MeridianAccDetailFilterWindow : MeridianCenterPage
+    public class MeridianDateFilterWindow : MeridianCenterPage
     {
         #region WebElements
 
@@ -31,7 +31,7 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement InvoiceDateField { get; set; } 
         #endregion
 
-        public MeridianAccDetailFilterWindow()
+        public MeridianDateFilterWindow()
         {
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
         }
