@@ -23,13 +23,13 @@ namespace BusinessObjects.Toll
 
 
         [FindsBy(How = How.XPath, Using = "//button[text()='Login']")]
-        public IWebElement LoginBtn { get; set; } 
+        public IWebElement LoginBtn { get; set; }
         #endregion
 
         /// <summary>
         /// initialize and set config sheet
         /// </summary>
-        /// <param name="ConfigSheet"></param>
+        /// <param name="configDic"></param>
         public TollLoginPage(Dictionary<string,string> configDic)
         {
             //initialize

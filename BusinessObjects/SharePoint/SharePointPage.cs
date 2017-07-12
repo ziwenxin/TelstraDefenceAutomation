@@ -20,13 +20,13 @@ namespace BusinessObjects.SharePoint
 
         #region WebElement
         [FindsBy(How = How.XPath, Using = "//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img")]
-        public IWebElement SaveIcon { get; set; } 
+        public IWebElement SaveIcon { get; set; }
         #endregion
 
         /// <summary>
         ///  initialize and set config sheet
         /// </summary>
-        /// <param name="configSheet"></param>
+        /// <param name="configDic"></param>
         public SharePointPage(Dictionary<string,string> configDic)
         {
             ConfigDic = configDic;

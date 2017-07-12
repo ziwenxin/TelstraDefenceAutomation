@@ -33,13 +33,19 @@ namespace Common
         public static void DeleteAllFiles(string path)
         {
 
-            //get directory info
+            //delete reports
             DirectoryInfo di = new DirectoryInfo(path);
             foreach (FileInfo fileInfo in di.GetFiles())
             {
                 fileInfo.Delete();
             }
 
+            //delete sales orders
+            di = new DirectoryInfo(path+ "\\SalesOrderHistory");
+            foreach (FileInfo fileInfo in di.GetFiles())
+            {
+                fileInfo.Delete();
+            }
         }
         /// <summary>
           /// move a file to archive, this will delete the original file

@@ -26,13 +26,13 @@ namespace BusinessObjects.Toll
         public IWebElement SOHDetailLink { get; set; }
 
         [FindsBy(How = How.XPath, Using = "//iframe")]
-        public IWebElement ReportFrame { get; set; } 
+        public IWebElement ReportFrame { get; set; }
         #endregion
-        
+
         /// <summary>
         /// initialize and set config sheet
         /// </summary>
-        /// <param name="ConfigSheet"></param>
+        /// <param name="configDic"></param>
         public TollReportDownloadPage(Dictionary<string,string> configDic)
         {
             //get ConfigSheet and WebDriver.ChromeDriver

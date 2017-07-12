@@ -9,7 +9,7 @@ using NPOI.SS.Formula.Functions;
 
 namespace Common
 {
-    public static class OfficeExcel
+    public static class OfficeExcelHelper
     {
         /// <summary>
         /// save a file from corrupted file to xlsx
@@ -33,7 +33,9 @@ namespace Common
                 appWorkbooks = app.Workbooks;
                 path=path.Replace("/", "\\");
                 //get work book
-                wb = appWorkbooks.Open(path + filename + ".xls");
+                if (!filename.EndsWith(".xls"))
+                    filename += ".xls";
+                wb = appWorkbooks.Open(path + filename);
                 //save as
                 wb.SaveAs(path + filename + ".xlsx", XlFileFormat.xlWorkbookDefault);
             }

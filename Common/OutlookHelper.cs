@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Common
         /// <param name="subject"></param>
         /// <param name="content"></param>
         /// <param name="configDic"></param>
-        public static void SendEmail(string subject, string content,Dictionary<string, string> configDic)
+        public static void SendEmail(string subject, string content, Dictionary<string, string> configDic)
         {
             //set address, subject and body of email
             string emailAddr = configDic["NotificationEmail"];
@@ -50,31 +51,61 @@ namespace Common
 
             //set up account
             Accounts accs = app.Session.Accounts;
-            Account account = (Account) accs[configDic["AttachmentEmail"]];
+            Account account = (Account)accs[configDic["AttachmentEmail"]];
             //get the inbox folder
             MAPIFolder Inbox = account.Session.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
             //get all the unread mails in today
-            string restriction = "[Unread]=true AND [ReceivedTime] >= '" + DateTime.Today.ToString("ddddd h:nn AMPM") +
+            string restriction = "[ReceivedTime] >= '" + DateTime.Today.ToString("ddddd h:nn") +
                                  "'";
             var items = Inbox.Items.Restrict(restriction);
-           
-            string savePath = configDic["LocalSavePath"] + "\\";
+
+            //read settings
+            string savePath = configDic["LocalSavePath"] + "\\"+ "SalesOrderHistory\\";
+            if (!Directory.Exists(savePath))
+                Directory.CreateDirectory(savePath);
+            int totalSuppliers = Convert.ToInt32(configDic["TotalSuppliers"]);
             //read all the unread mails
             foreach (object o in items)
             {
-                MailItem mi=o as MailItem;
-                if(mi==null)
+                //it is a mail
+                MailItem mi = o as MailItem;
+
+                if (mi == null)
                     continue;
                 //if it follows the rule
-                if (mi.Subject.Contains("Follow some rules"))
+                for (int i = 0; i < totalSuppliers; i++)
                 {
-                    //download all the attachments
-                    foreach (var attchment in mi.Attachments)
+                    //if the email is send by the suppliers
+                    if (mi.SenderEmailAddress.ToLower().Contains(configDic["SupplierNames" + (i + 1)].ToLower()))
                     {
-                        if(attchment.FileName.Contains(".xlsx"))
-                        attchment.SaveAsFile(savePath+attchment.FileName);
+                        //download all the attachments
+                        foreach (var attchment in mi.Attachments)
+                        {
+                            if (attchment.FileName.Contains(".xls"))
+                            {
+                                //set extension
+                                string extension = ".xls";
+                                if (attchment.FileName.Contains(".xlsx"))
+                                    extension = ".xlsx";
+                                    //set rename
+                                    string rename = configDic["SupplierName"].Replace(" ", "_") + "_" +DateTime.Today.ToString("dd-MM-yyyy");
+                                rename += extension;
+                                attchment.SaveAsFile(savePath + rename);
+                                //save the .xlsx directly
+                                if(extension==".xlsx")
+                                    continue;
+                                //save the .xls file as .xlsx
+
+                                OfficeExcelHelper.SaveAs(savePath, rename);
+                                //delete the original file
+                                if(File.Exists(savePath+ rename))
+                                    File.Delete(savePath+ rename);
+                            }
+
+                        }
                     }
                 }
+
             }
         }
     }

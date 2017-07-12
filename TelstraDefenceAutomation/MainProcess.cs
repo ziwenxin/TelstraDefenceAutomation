@@ -55,6 +55,8 @@ namespace TelstraDefenceAutomation
                 //get retry times
                 retryTimes = int.Parse(_configDic["RerunTimes"]);
 
+
+
                 //delete too old archives
                 FileHelper.DeleteOldArchive(_configDic["LocalSavePath"] + "\\Archive");
 
@@ -62,6 +64,9 @@ namespace TelstraDefenceAutomation
                 AddToLog("Deleting all previous files...");
                 FileHelper.DeleteAllFiles(_configDic["LocalSavePath"]);
                 AddToLog("Delete completed");
+
+                //download the supplier documents
+                OutlookHelper.DownloadAttachments(_configDic);
 
                 //download excel files
                 DownLoadMeridianDocuments();
@@ -226,7 +231,7 @@ namespace TelstraDefenceAutomation
             string filename = _configDic["SharepointFileName"];
             savepath += "\\";
             //set sheet name
-            OfficeExcel.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
+            OfficeExcelHelper.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
 
             AddToLog("DownLoad from share point completed");
         }
@@ -302,10 +307,11 @@ namespace TelstraDefenceAutomation
                 //change the '/' to '\'
                 localPath = localPath.Replace("/", "\\");
 
+                //remove all files before uploading
+                session.RemoveFiles(remotePath);
                 //upload the files into server,delete the files in the local
                 TransferOperationResult operationResult =
-                    session.PutFiles(localPath + "*.xls*", remotePath, true, transferOptions);
-
+                    session.PutFiles(localPath + "*.xlsx", remotePath, true, transferOptions);
                 //throw any error
                 operationResult.Check();
 
@@ -314,6 +320,11 @@ namespace TelstraDefenceAutomation
                 {
                     AddToLog(string.Format("Upload of {0} successed", transfer.FileName));
                 }
+                //store all the supplier documents
+                localPath += "\\SalesOrderHistory\\";
+                remotePath += "/SalesOrderHistory/";
+                operationResult = session.PutFiles(localPath + "*.xlsx", remotePath, true, transferOptions);
+                session.FileExists()
                 AddToLog("Upload all completed");
             }
 
@@ -397,7 +408,7 @@ namespace TelstraDefenceAutomation
                 //process the file by string
                 ExcelHelper.ProcessInvalidExcel(savePath, filename, rename);
                 //save the incorrupted file as xlsx
-                OfficeExcel.SaveAs(savePath, rename);
+                OfficeExcelHelper.SaveAs(savePath, rename);
                 FileHelper.MoveFileToArchive(savePath, rename, false);
                 //delete he priginal file
                 if (File.Exists(savePath + rename + ".xls"))
@@ -426,6 +437,8 @@ namespace TelstraDefenceAutomation
             string path = sheet.GetRow(5).GetCell(1).StringCellValue;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+            if (!Directory.Exists(path+ "\\Archive"))
+                Directory.CreateDirectory(path+ "\\Archive");
             //change default download location
             while (true)
             {
