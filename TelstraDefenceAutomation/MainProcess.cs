@@ -27,7 +27,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using PropertyCollection;
-using WinSCP;
 using Exception = System.Exception;
 
 
@@ -69,8 +68,8 @@ namespace TelstraDefenceAutomation
                 OutlookHelper.DownloadAttachments(_configDic);
 
                 //download excel files
-                DownLoadMeridianDocuments();
                 DownLoadTollDocuments();
+                DownLoadMeridianDocuments();
 
                 //delete several lines at the beginning
                 ProcessExcels();
@@ -81,12 +80,11 @@ namespace TelstraDefenceAutomation
                 //download files from share point
                 DownLoadSharePointDoc();
 
-                //download attachments from the supplier email
-                OutlookHelper.DownloadAttachments(_configDic);
 
                 //upload to server
-                UploadFiles();
-
+                AddToLog("Start to upload files to server...");
+                WinScpHelper.UploadFiles(_configDic,ref sb);
+                AddToLog("Upload all completed");
                 //run lavastorm program
                 if (_configDic["EnableAutomation?"].ToLower() == "yes")
                 {
@@ -275,60 +273,7 @@ namespace TelstraDefenceAutomation
             AddToLog(filename + " download completed");
         }
 
-        /// <summary>
-        /// upload all the files to the server using WinScp
-        /// </summary>
-        private static void UploadFiles()
-        {
-            AddToLog("Start to upload files to server...");
-            //setup session options
-            SessionOptions options = new SessionOptions
-            {
-                Protocol = Protocol.Sftp,
-                HostName = _configDic["HostName"],
-                UserName = _configDic["WinScpUsername"],
-                Password = _configDic["WinScpPassword"],
-                SshHostKeyFingerprint = _configDic["FingerPrint"],
-            };
 
-            using (Session session = new Session())
-            {
-                //connect
-                session.Open(options);
-
-                //upload files
-                TransferOptions transferOptions = new TransferOptions();
-                transferOptions.TransferMode = TransferMode.Binary;
-
-                //get path
-                string localPath = _configDic["LocalSavePath"];
-                string remotePath = _configDic["RemoteSavePath"];
-                localPath += "\\";
-                //change the '/' to '\'
-                localPath = localPath.Replace("/", "\\");
-
-                //remove all files before uploading
-                session.RemoveFiles(remotePath);
-                //upload the files into server,delete the files in the local
-                TransferOperationResult operationResult =
-                    session.PutFiles(localPath + "*.xlsx", remotePath, true, transferOptions);
-                //throw any error
-                operationResult.Check();
-
-                //print result
-                foreach (TransferEventArgs transfer in operationResult.Transfers)
-                {
-                    AddToLog(string.Format("Upload of {0} successed", transfer.FileName));
-                }
-                //store all the supplier documents
-                localPath += "\\SalesOrderHistory\\";
-                remotePath += "/SalesOrderHistory/";
-                operationResult = session.PutFiles(localPath + "*.xlsx", remotePath, true, transferOptions);
-                session.FileExists()
-                AddToLog("Upload all completed");
-            }
-
-        }
 
         /// <summary>
         /// process the excel files downloaded from 'Toll' and 'Meridian', it mainly delete several lines from the top of the documents
@@ -439,6 +384,8 @@ namespace TelstraDefenceAutomation
                 Directory.CreateDirectory(path);
             if (!Directory.Exists(path+ "\\Archive"))
                 Directory.CreateDirectory(path+ "\\Archive");
+            if (!Directory.Exists(path+ "\\SalesOrderHistory"))
+                Directory.CreateDirectory(path+ "\\SalesOrderHistory");
             //change default download location
             while (true)
             {
@@ -536,7 +483,7 @@ namespace TelstraDefenceAutomation
                 }
                 catch (Exception e)
                 {
-                    AddToLog("Retry Po Detail Download for " + (2 - retryCount) + " times");
+                    AddToLog("Retry Po Detail Download for " + (4 - retryCount) + " times");
                     //if file exists, delete it
                     string savepath = _configDic["LocalSavePath"];
                     string filename = _configDic["OriginalFileName1"];
@@ -560,7 +507,7 @@ namespace TelstraDefenceAutomation
                 }
                 catch (Exception e)
                 {
-                    AddToLog("Retry Account Detail Download for " + (2 - retryCount) + " times");
+                    AddToLog("Retry Account Detail Download for " + (4 - retryCount) + " times");
                     //if file exists, delete it
                     string savepath = _configDic["LocalSavePath"];
                     string filename = _configDic["OriginalFileName2"];

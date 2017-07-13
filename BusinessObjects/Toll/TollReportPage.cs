@@ -40,8 +40,8 @@ namespace BusinessObjects.Toll
             AddFilter();
             ViewReportBtn.Click();
 
-            //waut until the loading appears
-            wait.Until(ExpectedConditions.ElementIsVisible(By.Id("ReportViewer1_AsyncWait_Wait")));
+            //waut for 5 s
+            Thread.Sleep(5000);
             //wait until the loading finish
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));
             //retry downloading
@@ -60,6 +60,8 @@ namespace BusinessObjects.Toll
             {
                 //click the save link
                 SaveIcon.Click();
+                //wait a little
+                Thread.Sleep(1000);
                 ExcelSaveLink.Click();
                 int totalTime = 60000; //60 sec
                 bool isFileExists = false;

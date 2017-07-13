@@ -39,13 +39,6 @@ namespace Common
             {
                 fileInfo.Delete();
             }
-
-            //delete sales orders
-            di = new DirectoryInfo(path+ "\\SalesOrderHistory");
-            foreach (FileInfo fileInfo in di.GetFiles())
-            {
-                fileInfo.Delete();
-            }
         }
         /// <summary>
           /// move a file to archive, this will delete the original file

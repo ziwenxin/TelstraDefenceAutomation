@@ -18,7 +18,7 @@ namespace Common
         /// <param name="filename"></param>
         public static void SaveAs(string path, string filename)
         {
-            Application app=null;
+            Application app = null;
             Workbook wb = null;
             Workbooks appWorkbooks = null;
             //get excel application
@@ -31,22 +31,39 @@ namespace Common
                 }
                 //get work books
                 appWorkbooks = app.Workbooks;
-                path=path.Replace("/", "\\");
+                path = path.Replace("/", "\\");
                 //get work book
                 if (!filename.EndsWith(".xls"))
-                    filename += ".xls";
-                wb = appWorkbooks.Open(path + filename);
+                    wb = appWorkbooks.Open(path + filename + ".xls");
+                else
+                {
+                    wb = appWorkbooks.Open(path + filename);
+                    //remove .xls
+                    filename = filename.Substring(0, filename.IndexOf(".xls"));
+                }
                 //save as
-                wb.SaveAs(path + filename + ".xlsx", XlFileFormat.xlWorkbookDefault);
+                wb.SaveAs(path + filename + ".xlsx", XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing,
+                    false, false, XlSaveAsAccessMode.xlNoChange,
+                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             }
             finally
             {
-                wb.Close(0);
-                app.Quit();
                 //release
-                Marshal.ReleaseComObject(wb);
-                Marshal.ReleaseComObject(appWorkbooks);
-                Marshal.ReleaseComObject(app);
+
+                if (wb != null)
+                {
+                    wb.Close(0);
+                    Marshal.ReleaseComObject(wb);
+
+                }
+                if (appWorkbooks != null)
+                    Marshal.ReleaseComObject(appWorkbooks);
+                if (app != null)
+                {
+                    app.Quit();
+                    Marshal.ReleaseComObject(app);
+                }
+
             }
 
 
@@ -58,7 +75,7 @@ namespace Common
         /// <param name="filename"></param>
         /// <param name="srcName"></param>
         /// <param name="dstName"></param>
-        public static void ChangeSheetName(string savepath,string filename,string srcName,string dstName)
+        public static void ChangeSheetName(string savepath, string filename, string srcName, string dstName)
         {
             //declare
             Application app = null;
@@ -84,7 +101,7 @@ namespace Common
                 sheets = wb.Sheets;
                 sheet = sheets[srcName];
                 sheet.Name = dstName;
-              
+
                 //save as
                 sheet.SaveAs(savepath + filename + ".xlsx", XlFileFormat.xlWorkbookDefault);
             }

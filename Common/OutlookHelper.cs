@@ -55,8 +55,7 @@ namespace Common
             //get the inbox folder
             MAPIFolder Inbox = account.Session.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
             //get all the unread mails in today
-            string restriction = "[ReceivedTime] >= '" + DateTime.Today.ToString("ddddd h:nn") +
-                                 "'";
+            string restriction = "[Unread]=true";
             var items = Inbox.Items.Restrict(restriction);
 
             //read settings
@@ -88,7 +87,7 @@ namespace Common
                                 if (attchment.FileName.Contains(".xlsx"))
                                     extension = ".xlsx";
                                     //set rename
-                                    string rename = configDic["SupplierName"].Replace(" ", "_") + "_" +DateTime.Today.ToString("dd-MM-yyyy");
+                                    string rename = configDic["SupplierNames"+(i+1)].Replace(" ", "_") + "_" +DateTime.Today.ToString("dd-MM-yyyy");
                                 rename += extension;
                                 attchment.SaveAsFile(savePath + rename);
                                 //save the .xlsx directly

@@ -127,7 +127,7 @@ namespace BusinessObjects.MERIDIAN
             WebDriver.ChromeDriver.SwitchTo().Frame(CenterFrame);
             WebDriver.ChromeDriver.SwitchTo().Frame(PODetailInputFrame);
 
-
+            WaitForLoading();
 
 
             //dowloading the file
