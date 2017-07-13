@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Common;
 using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
@@ -11,8 +12,7 @@ namespace BusinessObjects.Toll
 {
     public class TollLoginPage
     {
-        //config sheet
-        private Dictionary<string,string> ConfigDic;
+
 
         #region WebElements
         [FindsBy(How = How.Id, Using = "UserName")]
@@ -29,11 +29,8 @@ namespace BusinessObjects.Toll
         /// <summary>
         /// initialize and set config sheet
         /// </summary>
-        /// <param name="configDic"></param>
-        public TollLoginPage(Dictionary<string,string> configDic)
+        public TollLoginPage()
         {
-            //initialize
-            ConfigDic = configDic;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
@@ -49,7 +46,7 @@ namespace BusinessObjects.Toll
             //wait for 2 secs 
             Thread.Sleep(2000);
             //launch the web
-            driver.Navigate().GoToUrl(ConfigDic["TollLoginURL"]);
+            driver.Navigate().GoToUrl(ConfigHelper._configDic["TollLoginURL"]);
 
             //wait until the save icon exists
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
@@ -83,11 +80,11 @@ namespace BusinessObjects.Toll
 
 
             //enter the credentials
-            UserNameField.SendKeys(ConfigDic["TollUserName"]);
-            PasswordField.SendKeys(ConfigDic["TollPassword"]);
+            UserNameField.SendKeys(ConfigHelper._configDic["TollUserName"]);
+            PasswordField.SendKeys(ConfigHelper._configDic["TollPassword"]);
             //click login
             LoginBtn.Click();
-            return new TollReportDownloadPage(ConfigDic);
+            return new TollReportDownloadPage();
         }
 
     }

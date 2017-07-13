@@ -117,5 +117,52 @@ namespace Common
                 Marshal.ReleaseComObject(app);
             }
         }
+
+        /// <summary>
+        /// Delete a sheet from a workbook
+        /// </summary>
+
+        public static void DeleteASheet(string savePath,string sheetName)
+        {
+            //declare
+            Application app = null;
+            Workbook wb = null;
+            Workbooks appWorkbooks = null;
+            Sheets sheets = null;
+            Worksheet sheet = null;
+            //get excel application
+            try
+            {
+                app = new Application();
+                if (app == null)
+                {
+                    throw new Exception("No Office Excel Installed");
+                }
+                //disable alert
+                app.DisplayAlerts = false;
+                //get work books
+                appWorkbooks = app.Workbooks;
+                savePath = savePath.Replace("/", "\\");
+                //get work book
+                wb = appWorkbooks.Open(savePath);
+                sheets = wb.Sheets;
+                sheet = sheets[sheetName];
+                sheet.Delete();
+                
+                //save as
+                wb.SaveAs(savePath, XlFileFormat.xlWorkbookDefault);
+            }
+            finally
+            {
+                wb.Close(0);
+                app.Quit();
+                //release
+                Marshal.ReleaseComObject(sheet);
+                Marshal.ReleaseComObject(sheets);
+                Marshal.ReleaseComObject(wb);
+                Marshal.ReleaseComObject(appWorkbooks);
+                Marshal.ReleaseComObject(app);
+            }
+        }
     }
 }

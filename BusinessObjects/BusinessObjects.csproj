@@ -94,6 +94,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{60bff519-c042-4384-894d-1be622fa2a4d}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Exceptions\Exceptions.csproj">
       <Project>{1484f1b1-c765-4de2-bfd6-d62869d01f1d}</Project>
       <Name>Exceptions</Name>

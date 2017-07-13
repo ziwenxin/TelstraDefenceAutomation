@@ -16,13 +16,13 @@ namespace Common
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="content"></param>
-        /// <param name="configDic"></param>
-        public static void SendEmail(string subject, string content, Dictionary<string, string> configDic)
+        public static void SendEmail(string subject, string content)
         {
+            LogHelper.AddToLog("Sending email...");
             //set address, subject and body of email
-            string emailAddr = configDic["NotificationEmail"];
+            string emailAddr = ConfigHelper._configDic["NotificationEmail"];
 
-            string autoPath = configDic["AutomationPath"];
+            string autoPath = ConfigHelper._configDic["AutomationPath"];
             string body = content;
 
             //set up a mail
@@ -38,20 +38,20 @@ namespace Common
             mail.SendUsingAccount = acc;
             //send email
             mail.Send();
+            LogHelper.AddToLog("Sending email completed");
         }
 
         /// <summary>
         /// this function will download all the attachments from a certain email of a certain account
         /// </summary>
-        /// <param name="configDic">the configuration data</param>
-        public static void DownloadAttachments(Dictionary<string, string> configDic)
+        public static void DownloadAttachments()
         {
             //set up an application
             Application app = new Application();
 
             //set up account
             Accounts accs = app.Session.Accounts;
-            Account account = (Account)accs[configDic["AttachmentEmail"]];
+            Account account = (Account)accs[ConfigHelper._configDic["AttachmentEmail"]];
             //get the inbox folder
             MAPIFolder Inbox = account.Session.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
             //get all the unread mails in today
@@ -59,10 +59,10 @@ namespace Common
             var items = Inbox.Items.Restrict(restriction);
 
             //read settings
-            string savePath = configDic["LocalSavePath"] + "\\"+ "SalesOrderHistory\\";
+            string savePath = ConfigHelper._configDic["LocalSavePath"] + "\\"+ "SalesOrderHistory\\";
             if (!Directory.Exists(savePath))
                 Directory.CreateDirectory(savePath);
-            int totalSuppliers = Convert.ToInt32(configDic["TotalSuppliers"]);
+            int totalSuppliers = Convert.ToInt32(ConfigHelper._configDic["TotalSuppliers"]);
             //read all the unread mails
             foreach (object o in items)
             {
@@ -75,7 +75,7 @@ namespace Common
                 for (int i = 0; i < totalSuppliers; i++)
                 {
                     //if the email is send by the suppliers
-                    if (mi.SenderEmailAddress.ToLower().Contains(configDic["SupplierNames" + (i + 1)].ToLower()))
+                    if (mi.SenderEmailAddress.ToLower().Contains(ConfigHelper._configDic["SupplierNames" + (i + 1)].ToLower()))
                     {
                         //download all the attachments
                         foreach (var attchment in mi.Attachments)
@@ -87,7 +87,7 @@ namespace Common
                                 if (attchment.FileName.Contains(".xlsx"))
                                     extension = ".xlsx";
                                     //set rename
-                                    string rename = configDic["SupplierNames"+(i+1)].Replace(" ", "_") + "_" +DateTime.Today.ToString("dd-MM-yyyy");
+                                    string rename = ConfigHelper._configDic["SupplierNames"+(i+1)].Replace(" ", "_") + "_" +DateTime.Today.ToString("dd-MM-yyyy");
                                 rename += extension;
                                 attchment.SaveAsFile(savePath + rename);
                                 //save the .xlsx directly

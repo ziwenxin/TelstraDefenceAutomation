@@ -16,9 +16,10 @@ namespace Common
         /// <summary>
         /// run lavastrom to process the excel files in the server side
         /// </summary>
-        /// <param name="configDic"></param>
-        public static void RunLavaStorm(Dictionary<string,string> configDic)
+        /// <param name="ConfigHelper._configDic"></param>
+        public static void RunLavaStorm()
         {
+            LogHelper.AddToLog("Start to run lavastorm...");
             //new a process to open the file
             using (Process proc = new Process())
             {
@@ -33,8 +34,8 @@ namespace Common
                 //start and input
                 proc.Start();
                 //get program folder and name
-                string folder = configDic["ProgramFolder"];
-                string filename = configDic["ProgramName"];
+                string folder = ConfigHelper._configDic["ProgramFolder"];
+                string filename = ConfigHelper._configDic["ProgramName"];
 
                 string dosLine = "\"" + folder + "\\" + filename + "\"";
                 proc.StandardInput.WriteLine(dosLine);
@@ -63,14 +64,15 @@ namespace Common
                 Thread.Sleep(1000);
                 simulator.Mouse.LeftButtonClick();
 
+                int delaySec = Convert.ToInt32(ConfigHelper._configDic["DelaySeconds"]);
                 //wait for running
-                Thread.Sleep(300000);
+                Thread.Sleep(delaySec*1000);
                 //save the programs
                 simulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_S);
                 Thread.Sleep(3000);
                 //kill the process
                 ProcessHelper.KillAllProcess("bre");
-
+                LogHelper.AddToLog("Lavastrom runs completed");
             }
 
 

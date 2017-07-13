@@ -89,9 +89,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdHelper.cs" />
+    <Compile Include="ConfigHelper.cs" />
+    <Compile Include="Excel\ExcelProcesser.cs" />
     <Compile Include="FileHelper.cs" />
-    <Compile Include="OfficeExcelHelper.cs" />
-    <Compile Include="ExcelHelper.cs" />
+    <Compile Include="LogHelper.cs" />
+    <Compile Include="Excel\OfficeExcelHelper.cs" />
+    <Compile Include="Excel\ExcelHelper.cs" />
     <Compile Include="OutlookHelper.cs" />
     <Compile Include="ProcessHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

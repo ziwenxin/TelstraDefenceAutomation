@@ -39,9 +39,8 @@ namespace BusinessObjects.MERIDIAN
         /// <summary>
         /// Enter the detail and go to PO detail page
         /// </summary>
-        /// <param name="configDic"></param>
         /// <returns>an object of variable entry page</returns>
-        public MeridianVariableEntryPage GotoPoDetailEntryPage(Dictionary<string,string> configDic)
+        public MeridianVariableEntryPage GotoPoDetailEntryPage()
         {
             //wait general report link exists
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
@@ -56,15 +55,15 @@ namespace BusinessObjects.MERIDIAN
             //wait PO detail link exists
             wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='PO Details']")));
             PODetailsLink.Click();
-            return new MeridianVariableEntryPage(configDic);
+            return new MeridianVariableEntryPage();
         }
 
         /// <summary>
         /// Enter the detail and go to Account detail page
         /// </summary>
-        /// <param name="configDic"></param>
+        /// <param name="ConfigHelper._configDic"></param>
         /// <returns>an object of variable entry page</returns>
-        public MeridianVariableEntryPage GotoAccountDetailEntryPage(Dictionary<string,string> configDic)
+        public MeridianVariableEntryPage GotoAccountDetailEntryPage()
         {
             //wait general report link exists
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(8));
@@ -79,7 +78,7 @@ namespace BusinessObjects.MERIDIAN
             //wait PO detail link exists
             wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='Accounting Detail']")));
             AccountDetailLink.Click();
-            return new MeridianVariableEntryPage(configDic);
+            return new MeridianVariableEntryPage();
         }
     }
 }

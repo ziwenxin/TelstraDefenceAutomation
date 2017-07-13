@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common;
 using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
@@ -15,8 +16,7 @@ namespace BusinessObjects.MERIDIAN
 
     public class MeridianPortalPage
     {
-        //config sheet
-        private Dictionary<string, string> ConfigDic { get; set; }
+
 
 
         #region WebElements
@@ -24,9 +24,8 @@ namespace BusinessObjects.MERIDIAN
         public IWebElement MeridianLaunchImg { get; set; } 
         #endregion
 
-        public MeridianPortalPage(Dictionary<string,string> configDic)
+        public MeridianPortalPage()
         {
-            ConfigDic = configDic;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
         }
@@ -44,7 +43,7 @@ namespace BusinessObjects.MERIDIAN
                 try
                 {
                     //go to launch url
-                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigDic["MeridianPortalURL"]);
+                    WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigHelper._configDic["MeridianPortalURL"]);
                     //wait for the image appears
                     WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
                     wait.Until(ExpectedConditions.ElementIsVisible(By.Id("2406890")));

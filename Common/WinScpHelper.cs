@@ -12,17 +12,17 @@ namespace Common
         /// <summary>
         /// upload all the files to the server using WinScp
         /// </summary>
-        public static void UploadFiles(Dictionary<string, string> configDic, ref StringBuilder sb)
+        public static void UploadFiles()
         {
-
+            LogHelper.AddToLog("Start to upload files to server...");
             //setup session options
             SessionOptions options = new SessionOptions
             {
                 Protocol = Protocol.Sftp,
-                HostName = configDic["HostName"],
-                UserName = configDic["WinScpUsername"],
-                Password = configDic["WinScpPassword"],
-                SshHostKeyFingerprint = configDic["FingerPrint"],
+                HostName = ConfigHelper._configDic["HostName"],
+                UserName = ConfigHelper._configDic["WinScpUsername"],
+                Password = ConfigHelper._configDic["WinScpPassword"],
+                SshHostKeyFingerprint = ConfigHelper._configDic["FingerPrint"],
             };
 
             using (Session session = new Session())
@@ -35,8 +35,8 @@ namespace Common
                 transferOptions.TransferMode = TransferMode.Binary;
 
                 //get path
-                string localPath = configDic["LocalSavePath"];
-                string remotePath = configDic["RemoteSavePath"];
+                string localPath = ConfigHelper._configDic["LocalSavePath"];
+                string remotePath = ConfigHelper._configDic["RemoteSavePath"];
                 localPath += "\\";
                 remotePath += "/";
                 //change the '/' to '\'
@@ -53,20 +53,19 @@ namespace Common
                 //print result
                 foreach (TransferEventArgs transfer in operationResult.Transfers)
                 {
-                    string msg = string.Format("Upload of {0} successed", transfer.FileName);
-                    sb.Append(msg + "\r\n");
-                    Console.WriteLine(msg);
+                    LogHelper.AddToLog(string.Format("Upload of {0} successes", transfer.FileName));
                 }
                 
 
                 //upload supplier documents
-                UploadSupplierDocuments(session, configDic, ref sb);
+                UploadSupplierDocuments(session);
 
+                LogHelper.AddToLog("Upload all completed");
             }
 
         }
 
-        private static void UploadSupplierDocuments(Session session, Dictionary<string, string> configDic, ref StringBuilder sb)
+        private static void UploadSupplierDocuments(Session session)
         {
             //transfer options
             TransferOptions transferOptions = new TransferOptions();
@@ -75,14 +74,14 @@ namespace Common
             TransferOperationResult operationResult = null;
             RemovalOperationResult removalOperationResult = null;
             //get local path and total suppliers
-            string localPath = configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
-            string remotePath = configDic["RemoteSavePath"] + "/SalesOrderHistory/";
-            int totalSuppliers = Convert.ToInt32(configDic["TotalSuppliers"]);
+            string localPath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
+            string remotePath = ConfigHelper._configDic["RemoteSavePath"] + "/SalesOrderHistory/";
+            int totalSuppliers = Convert.ToInt32(ConfigHelper._configDic["TotalSuppliers"]);
 
             for (int i = 0; i < totalSuppliers; i++)
             {
                 //check if the updated file exists
-                string supplierFileName = configDic["SupplierNames" + (i + 1)];
+                string supplierFileName = ConfigHelper._configDic["SupplierNames" + (i + 1)];
                 string pattern = supplierFileName + "*.xlsx";
                 //if it needs to be updated
                 foreach (var file in session.EnumerateRemoteFiles(remotePath, pattern, EnumerationOptions.None))
@@ -101,9 +100,7 @@ namespace Common
                 if (operationResult.Transfers.Count >0)
                 {
 
-                    string msg = string.Format("Upload of {0} successed", operationResult.Transfers.First().FileName);
-                    sb.Append(msg + "\r\n");
-                    Console.WriteLine(msg);
+                    LogHelper.AddToLog(string.Format("Upload of {0} successes", operationResult.Transfers.First().FileName));
                 }
 
             }

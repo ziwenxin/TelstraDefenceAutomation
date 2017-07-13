@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common;
 using Exceptions;
 using NPOI.SS.UserModel;
 using OpenQA.Selenium;
@@ -11,8 +12,7 @@ namespace BusinessObjects.Toll
 {
     public class TollReportDownloadPage
     {
-        //config sheet 
-        private Dictionary<string,string> ConfigDic;
+
 
         #region WebElements
 
@@ -32,15 +32,13 @@ namespace BusinessObjects.Toll
         /// <summary>
         /// initialize and set config sheet
         /// </summary>
-        /// <param name="configDic"></param>
-        public TollReportDownloadPage(Dictionary<string,string> configDic)
+        public TollReportDownloadPage()
         {
-            //get ConfigSheet and WebDriver.ChromeDriver
-            this.ConfigDic = configDic;
+
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
             //find elements with the file names from config file
-            int totalDocuments = int.Parse(ConfigDic["TotalTollDocuments"]);
+            int totalDocuments = int.Parse(ConfigHelper._configDic["TotalTollDocuments"]);
             if (totalDocuments <= 0)
                 throw new NoReportsException();
             //switch to report frame
@@ -69,7 +67,7 @@ namespace BusinessObjects.Toll
         /// </summary>
         public void GoToReportPage()
         {
-            WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigDic["TollReportURL"]);
+            WebDriver.ChromeDriver.Navigate().GoToUrl(ConfigHelper._configDic["TollReportURL"]);
             WebDriver.ChromeDriver.SwitchTo().DefaultContent();
             WebDriver.ChromeDriver.SwitchTo().Frame(ReportFrame);
 
@@ -83,7 +81,7 @@ namespace BusinessObjects.Toll
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigDic["TollDocumentName1"] + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigHelper._configDic["TollDocumentName1"] + "']")));
             //click the link
             GoodReportLink.Click();
             return new TollGoodReportPage();
@@ -96,7 +94,7 @@ namespace BusinessObjects.Toll
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigDic["TollDocumentName2"] + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigHelper._configDic["TollDocumentName2"] + "']")));
 
             //click the link
             ShipDetailLink.Click();
@@ -110,7 +108,7 @@ namespace BusinessObjects.Toll
         {
             //wait for the link appears
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigDic["TollDocumentName3"] + "']")));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//a[text()='" + ConfigHelper._configDic["TollDocumentName3"] + "']")));
 
             //click on the link
             SOHDetailLink.Click();

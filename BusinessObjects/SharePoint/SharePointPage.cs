@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Common;
 using NPOI.SS.UserModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
@@ -15,8 +16,6 @@ namespace BusinessObjects.SharePoint
 {
     public class SharePointPage
     {
-        //config sheet
-        private Dictionary<string,string> ConfigDic { get; set; }
 
         #region WebElement
         [FindsBy(How = How.XPath, Using = "//*[@id='onetidDoclibViewTbl0']/tbody/tr[6]/td[1]/a/img")]
@@ -26,10 +25,9 @@ namespace BusinessObjects.SharePoint
         /// <summary>
         ///  initialize and set config sheet
         /// </summary>
-        /// <param name="configDic"></param>
-        public SharePointPage(Dictionary<string,string> configDic)
+        public SharePointPage()
         {
-            ConfigDic = configDic;
+
             PageFactory.InitElements(WebDriver.ChromeDriver,this);
         }
 
@@ -43,8 +41,8 @@ namespace BusinessObjects.SharePoint
            
 
             //get file full path
-            string savePath = ConfigDic["LocalSavePath"];
-            string filename = ConfigDic["SharepointFileName"];
+            string savePath = ConfigHelper._configDic["LocalSavePath"];
+            string filename = ConfigHelper._configDic["SharepointFileName"];
             savePath += "\\";
             filename += ".xlsx";
             //click save 
@@ -86,7 +84,7 @@ namespace BusinessObjects.SharePoint
         private void GoToMainPage()
         {
             //go to share point page
-            string URL = ConfigDic["SharepointURL"];
+            string URL = ConfigHelper._configDic["SharepointURL"];
             WebDriver.ChromeDriver.Navigate().GoToUrl(URL);
         }
 

@@ -32,13 +32,14 @@ namespace Common
         /// <param name="path">the folder wants to delete all the files</param>
         public static void DeleteAllFiles(string path)
         {
-
+            LogHelper.AddToLog("Deleting all previous files...");
             //delete reports
             DirectoryInfo di = new DirectoryInfo(path);
             foreach (FileInfo fileInfo in di.GetFiles())
             {
                 fileInfo.Delete();
             }
+            LogHelper.AddToLog("Delete completed");
         }
         /// <summary>
           /// move a file to archive, this will delete the original file

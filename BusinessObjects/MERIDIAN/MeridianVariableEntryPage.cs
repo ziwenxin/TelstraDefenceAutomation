@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
@@ -9,8 +10,7 @@ namespace BusinessObjects.MERIDIAN
 {
     public class MeridianVariableEntryPage : MeridianCenterPage
     {
-        //config sheet
-        private Dictionary<string, string> ConfigDIc { get; set; }
+
         #region WebElements
 
         [FindsBy(How = How.Id, Using = "DLG_VARIABLE_vsc_cvl_VAR_3_INPUT_inp")]
@@ -27,10 +27,8 @@ namespace BusinessObjects.MERIDIAN
         /// <summary>
         /// initial web element and set config sheet
         /// </summary>
-        /// <param name="configDic"></param>
-        public MeridianVariableEntryPage(Dictionary<string,string> configDic)
+        public MeridianVariableEntryPage()
         {
-            ConfigDIc = configDic;
             PageFactory.InitElements(WebDriver.ChromeDriver, this);
 
 
@@ -64,7 +62,7 @@ namespace BusinessObjects.MERIDIAN
 
 
             //get code from config file
-            string code = ConfigDIc["TelstraProfitCentres"];
+            string code = ConfigHelper._configDic["TelstraProfitCentres"];
             //wait for the input field
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id(inputId)));
             //input
