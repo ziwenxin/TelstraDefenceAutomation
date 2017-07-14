@@ -32,9 +32,9 @@ namespace Common
             mail.To = emailAddr;
             mail.Body = body;
             mail.Subject = subject;
-            //set up account
+            //set up the first account
             Accounts accs = app.Session.Accounts;
-            Account acc = (Account)accs.First();
+            Account acc = (Account) accs.First();
             mail.SendUsingAccount = acc;
             //send email
             mail.Send();
@@ -50,13 +50,14 @@ namespace Common
             Application app = new Application();
 
             //set up account
+            
             Accounts accs = app.Session.Accounts;
-            Account account = (Account)accs[ConfigHelper._configDic["AttachmentEmail"]];
+            string folderName = ConfigHelper._configDic["AttachmentEmail"];
             //get the inbox folder
-            MAPIFolder Inbox = account.Session.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+            MAPIFolder inbox = app.Session.Folders[folderName].Folders["Inbox"];
             //get all the unread mails in today
             string restriction = "[Unread]=true";
-            var items = Inbox.Items.Restrict(restriction);
+            var items = inbox.Items.Restrict(restriction);
 
             //read settings
             string savePath = ConfigHelper._configDic["LocalSavePath"] + "\\"+ "SalesOrderHistory\\";
@@ -103,6 +104,8 @@ namespace Common
 
                         }
                     }
+                    //set it read
+                    mi.UnRead = false;
                 }
 
             }

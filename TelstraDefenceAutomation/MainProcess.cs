@@ -110,6 +110,8 @@ namespace TelstraDefenceAutomation
             }
             catch (Exception e)
             {
+                //log
+                LogHelper.AddToLog(e.ToString());
                 //if still needs to retry
                 if (retryTimes > 0)
                 {
@@ -133,8 +135,7 @@ namespace TelstraDefenceAutomation
                 }
 
 
-                //log
-                LogHelper.AddToLog(e.ToString());
+ 
             }
             finally
             {
