@@ -81,7 +81,7 @@ namespace Common
             for (int i = 0; i < totalSuppliers; i++)
             {
                 //check if the updated file exists
-                string supplierFileName = ConfigHelper._configDic["SupplierNames" + (i + 1)];
+                string supplierFileName = ConfigHelper._configDic["SupplierNames" + (i + 1)].Replace(" ","_");
                 string pattern = supplierFileName + "*.xlsx";
                 //if it needs to be updated
                 foreach (var file in session.EnumerateRemoteFiles(remotePath, pattern, EnumerationOptions.None))

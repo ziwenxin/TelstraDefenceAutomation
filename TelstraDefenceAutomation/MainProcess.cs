@@ -59,12 +59,13 @@ namespace TelstraDefenceAutomation
 
                 FileHelper.DeleteAllFiles(ConfigHelper._configDic["LocalSavePath"]);
 
-                ProcessSalesExcels();
 
                 //download the supplier documents
                 OutlookHelper.DownloadAttachments();
 
-                //delete the first row and sheet1 for secure edde
+                //delete the first row and sheet1 for secure edge and delete 4 rows for avnet
+
+                ProcessSalesExcels();
 
 
 
@@ -174,6 +175,7 @@ namespace TelstraDefenceAutomation
         /// </summary>
         private static void ProcessSalesExcels()
         {
+            ExcelProcesser.ProcessAvnetExcel();
            ExcelProcesser.ProcessSucureExcel();
         }
 

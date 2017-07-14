@@ -107,22 +107,35 @@ namespace Common
             }
             finally
             {
-                wb.Close(0);
-                app.Quit();
                 //release
-                Marshal.ReleaseComObject(sheet);
-                Marshal.ReleaseComObject(sheets);
-                Marshal.ReleaseComObject(wb);
-                Marshal.ReleaseComObject(appWorkbooks);
-                Marshal.ReleaseComObject(app);
+                if (sheet != null)
+                    Marshal.ReleaseComObject(sheet);
+                if (sheets != null)
+                    Marshal.ReleaseComObject(sheets);
+                if (wb != null)
+                {
+
+                    wb.Close(0);
+                    Marshal.ReleaseComObject(wb);
+                }
+                if (appWorkbooks != null)
+                    Marshal.ReleaseComObject(appWorkbooks);
+
+                if (app != null)
+                {
+                    app.Quit();
+                    Marshal.ReleaseComObject(app);
+                }
+
             }
         }
 
         /// <summary>
-        /// Delete a sheet from a workbook
+        /// Delete a sheet from an excel
         /// </summary>
-
-        public static void DeleteASheet(string savePath,string sheetName)
+        /// <param name="savePath"></param>
+        /// <param name="sheetName"></param>
+        public static void DeleteASheet(string savePath, string sheetName)
         {
             //declare
             Application app = null;
@@ -146,22 +159,106 @@ namespace Common
                 //get work book
                 wb = appWorkbooks.Open(savePath);
                 sheets = wb.Sheets;
-                sheet = sheets[sheetName];
-                sheet.Delete();
-                
-                //save as
-                wb.SaveAs(savePath, XlFileFormat.xlWorkbookDefault);
+                //delete the sheet
+                if (sheets.Count > 1)
+                    sheet = sheets[sheetName];
+                if (sheet != null)
+                {
+                    sheet.Delete();
+                    //save as
+                    wb.SaveAs(savePath, XlFileFormat.xlWorkbookDefault);
+                }
+
+
             }
             finally
             {
-                wb.Close(0);
-                app.Quit();
                 //release
-                Marshal.ReleaseComObject(sheet);
-                Marshal.ReleaseComObject(sheets);
-                Marshal.ReleaseComObject(wb);
-                Marshal.ReleaseComObject(appWorkbooks);
-                Marshal.ReleaseComObject(app);
+                if (sheet != null)
+                    Marshal.ReleaseComObject(sheet);
+                if (sheets != null)
+                    Marshal.ReleaseComObject(sheets);
+                if (wb != null)
+                {
+
+                    wb.Close(0);
+                    Marshal.ReleaseComObject(wb);
+                }
+                if (appWorkbooks != null)
+                    Marshal.ReleaseComObject(appWorkbooks);
+
+                if (app != null)
+                {
+                    app.Quit();
+                    Marshal.ReleaseComObject(app);
+                }
+            }
+        }
+
+        public static void DeleteTopRows(int numRows, string fullpath)
+        {
+            //declare
+            Application app = null;
+            Workbook wb = null;
+            Workbooks appWorkbooks = null;
+            Sheets sheets = null;
+            Worksheet sheet = null;
+            Range rows = null;
+            //get excel application
+            try
+            {
+                app = new Application();
+                if (app == null)
+                {
+                    throw new Exception("No Office Excel Installed");
+                }
+                //disable alert
+                app.DisplayAlerts = false;
+                //get work books
+                appWorkbooks = app.Workbooks;
+                fullpath = fullpath.Replace("/", "\\");
+                //get work book
+                wb = appWorkbooks.Open(fullpath);
+                sheets = wb.Sheets;
+                //get the first sheet
+                if (sheets.Count > 0)
+                    sheet = sheets[1];
+                if (sheet != null)
+                {
+                    //delete first couple of rows
+
+                    rows = sheet.Range["A1", "A" + numRows];
+                    rows.EntireRow.Delete(XlDirection.xlUp);
+                }
+
+                //save as
+                sheet.SaveAs(fullpath, XlFileFormat.xlWorkbookDefault);
+            }
+
+            finally
+            {
+                //release
+                if (rows != null)
+                    Marshal.ReleaseComObject(rows);
+
+                if (sheet != null)
+                    Marshal.ReleaseComObject(sheet);
+                if (sheets != null)
+                    Marshal.ReleaseComObject(sheets);
+                if (wb != null)
+                {
+
+                    wb.Close(0);
+                    Marshal.ReleaseComObject(wb);
+                }
+                if (appWorkbooks != null)
+                    Marshal.ReleaseComObject(appWorkbooks);
+
+                if (app != null)
+                {
+                    app.Quit();
+                    Marshal.ReleaseComObject(app);
+                }
             }
         }
     }

@@ -31,17 +31,17 @@ namespace TelstraDefenceAutomation
                 //check if the file exists
                 if (!File.Exists(filepath + extension))
                 {
-                    if (!File.Exists(filepath + ".xls"))
-                        throw new Exception(filepath + " is not downloaded");
+                    throw new Exception(filepath + " is not downloaded");
                 }
-                //process the file by string
-                ExcelHelper.ProcessInvalidExcel(savePath, filename, rename);
+                //delete the top lines 
+                ExcelHelper.ProcessInvalidExcel(savePath,filename,rename);
+
                 //save the corrupted file as xlsx
                 OfficeExcelHelper.SaveAs(savePath, rename);
                 FileHelper.MoveFileToArchive(savePath, rename, false);
                 //delete he original file
-                if (File.Exists(savePath + rename + ".xls"))
-                    File.Delete(savePath + rename + ".xls");
+                if (File.Exists(savePath + filename + ".xls"))
+                    File.Delete(savePath + filename + ".xls");
 
             }
 
@@ -68,18 +68,15 @@ namespace TelstraDefenceAutomation
 
                 if (!File.Exists(filepath + extension))
                 {
-                    if (!File.Exists(filepath + ".xls"))
-                        throw new Exception(filepath + " is not downloaded");
+                    throw new Exception(filepath + " is not downloaded");
                 }
-                int linesToBeDeleted = int.Parse(ConfigHelper._configDic["LinesToBeDeleted" + (i + 1)]);
+                int linesToBeDeleted = int.Parse(ConfigHelper._configDic["TollLinesToBeDeleted" + (i + 1)]);
 
-                //use library to read an excel file
-                ISheet reportsheet = ExcelHelper.ReadExcel(filepath + extension);
 
                 //do the archive
-                FileHelper.MoveFileToArchive(savePath, filename, true);
+                FileHelper.MoveFileToArchive(savePath, filename, false);
                 //save
-                ExcelHelper.SaveTo(reportsheet, filepath + ".xlsx", linesToBeDeleted);
+                OfficeExcelHelper.DeleteTopRows(linesToBeDeleted, savePath + filename + extension);
                 LogHelper.AddToLog(filename + " process completed");
 
             }
@@ -87,20 +84,43 @@ namespace TelstraDefenceAutomation
 
         }
 
+        /// <summary>
+        /// It will delete the top row of the excel
+        /// </summary>
         public static void ProcessSucureExcel()
         {
             //get fullpath
             string savepath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
-            string companyName = ConfigHelper._configDic["SupplierNames4"].Replace(" ","_");
-            string fullPath = savepath + companyName+"_" + DateTime.Today.ToString("dd-MM-yyyy")+".xlsx";
+            string companyName = ConfigHelper._configDic["SupplierNames4"].Replace(" ", "_");
+            string fullPath = savepath + companyName + "_" + DateTime.Today.ToString("dd-MM-yyyy") + ".xlsx";
             if (File.Exists(fullPath))
             {
                 //delete sheet 2
                 OfficeExcelHelper.DeleteASheet(fullPath, "Sheet1");
 
+                int lines = Convert.ToInt32(ConfigHelper._configDic["SupplierLinesToBeDeleted4"]);
+
                 //delete the first line
-                ISheet sheet = ExcelHelper.ReadExcel(fullPath);
-                ExcelHelper.SaveTo(sheet, fullPath, 1);
+                OfficeExcelHelper.DeleteTopRows(lines, fullPath);
+            }
+        }
+
+        /// <summary>
+        /// It will delete the top 4 rows of the excel
+        /// </summary>
+        public static void ProcessAvnetExcel()
+        {
+            //get fullpath
+            string savepath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
+            string companyName = ConfigHelper._configDic["SupplierNames1"].Replace(" ", "_");
+            string fullPath = savepath + companyName + "_" + DateTime.Today.ToString("dd-MM-yyyy") + ".xlsx";
+            if (File.Exists(fullPath))
+            {
+
+                int lines = Convert.ToInt32(ConfigHelper._configDic["SupplierLinesToBeDeleted1"]);
+
+                //delete the first 4 rows
+                OfficeExcelHelper.DeleteTopRows(lines, fullPath);
             }
         }
     }
