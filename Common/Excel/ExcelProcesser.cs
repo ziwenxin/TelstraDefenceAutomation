@@ -17,7 +17,6 @@ namespace TelstraDefenceAutomation
         public static void ProcessMeridianExcels()
         {
             //get total meridian report numbers
-            int totalWaitMilliSecs = 0;
             int totalReportNum = int.Parse(ConfigHelper._configDic["TotalMeridianDocuments"]);
             for (int i = 0; i < totalReportNum; i++)
             {
@@ -31,6 +30,8 @@ namespace TelstraDefenceAutomation
                 //check if the file exists
                 if (!File.Exists(filepath + extension))
                 {
+                    if (File.Exists(savePath + rename + ".xlsx"))
+                        continue;
                     throw new Exception(filepath + " is not downloaded");
                 }
                 //delete the top lines 
@@ -61,6 +62,8 @@ namespace TelstraDefenceAutomation
                 //read from report
                 string savePath = ConfigHelper._configDic["LocalSavePath"];
                 string filename = ConfigHelper._configDic["TollDocumentName" + (i + 1)];
+                if (!filename.ToLower().Contains("v2"))
+                    filename += " v2";
                 savePath += "\\";
                 string filepath = savePath + filename;
                 //check if the file exists
@@ -68,6 +71,8 @@ namespace TelstraDefenceAutomation
 
                 if (!File.Exists(filepath + extension))
                 {
+                    if (File.Exists(FileHelper.RemoveV2(filepath) + extension))
+                        continue;
                     throw new Exception(filepath + " is not downloaded");
                 }
                 int linesToBeDeleted = int.Parse(ConfigHelper._configDic["TollLinesToBeDeleted" + (i + 1)]);
@@ -77,6 +82,8 @@ namespace TelstraDefenceAutomation
                 FileHelper.MoveFileToArchive(savePath, filename, false);
                 //save
                 OfficeExcelHelper.DeleteTopRows(linesToBeDeleted, savePath + filename + extension);
+                //save without v2
+                File.Move(savePath + filename + extension, savePath + FileHelper.RemoveV2(filename) + extension);
                 LogHelper.AddToLog(filename + " process completed");
 
             }
@@ -85,20 +92,22 @@ namespace TelstraDefenceAutomation
         }
 
         /// <summary>
-        /// It will delete the top row of the excel
+        /// It will delete the top row of the excel and delete a sheet
         /// </summary>
         public static void ProcessSucureExcel()
         {
             //get fullpath
             string savepath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
-            string companyName = ConfigHelper._configDic["SupplierNames4"].Replace(" ", "_");
-            string fullPath = savepath + companyName + "_" + DateTime.Today.ToString("dd-MM-yyyy") + ".xlsx";
+            string companyName = ConfigHelper._configDic["SupplierNames3"].Replace(" ", "_");
+            string fullPath = savepath + companyName + "_"  + ".xlsx";
             if (File.Exists(fullPath))
             {
+                
+
                 //delete sheet 2
                 OfficeExcelHelper.DeleteASheet(fullPath, "Sheet1");
-
-                int lines = Convert.ToInt32(ConfigHelper._configDic["SupplierLinesToBeDeleted4"]);
+  
+                int lines = Convert.ToInt32(ConfigHelper._configDic["SupplierLinesToBeDeleted3"]);
 
                 //delete the first line
                 OfficeExcelHelper.DeleteTopRows(lines, fullPath);
@@ -113,12 +122,11 @@ namespace TelstraDefenceAutomation
             //get fullpath
             string savepath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
             string companyName = ConfigHelper._configDic["SupplierNames1"].Replace(" ", "_");
-            string fullPath = savepath + companyName + "_" + DateTime.Today.ToString("dd-MM-yyyy") + ".xlsx";
+            string fullPath = savepath + companyName + "_"  + ".xlsx";
             if (File.Exists(fullPath))
             {
 
                 int lines = Convert.ToInt32(ConfigHelper._configDic["SupplierLinesToBeDeleted1"]);
-
                 //delete the first 4 rows
                 OfficeExcelHelper.DeleteTopRows(lines, fullPath);
             }

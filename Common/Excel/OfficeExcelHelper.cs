@@ -168,8 +168,6 @@ namespace Common
                     //save as
                     wb.SaveAs(savePath, XlFileFormat.xlWorkbookDefault);
                 }
-
-
             }
             finally
             {

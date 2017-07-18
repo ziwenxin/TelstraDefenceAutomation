@@ -34,7 +34,7 @@ namespace Common
             mail.Subject = subject;
             //set up the first account
             Accounts accs = app.Session.Accounts;
-            Account acc = (Account) accs.First();
+            Account acc = (Account)accs.First();
             mail.SendUsingAccount = acc;
             //send email
             mail.Send();
@@ -50,7 +50,7 @@ namespace Common
             Application app = new Application();
 
             //set up account
-            
+
             Accounts accs = app.Session.Accounts;
             string folderName = ConfigHelper._configDic["AttachmentEmail"];
             //get the inbox folder
@@ -60,7 +60,7 @@ namespace Common
             var items = inbox.Items.Restrict(restriction);
 
             //read settings
-            string savePath = ConfigHelper._configDic["LocalSavePath"] + "\\"+ "SalesOrderHistory\\";
+            string savePath = ConfigHelper._configDic["LocalSavePath"] + "\\" + "SalesOrderHistory\\";
             if (!Directory.Exists(savePath))
                 Directory.CreateDirectory(savePath);
             int totalSuppliers = Convert.ToInt32(ConfigHelper._configDic["TotalSuppliers"]);
@@ -72,11 +72,14 @@ namespace Common
 
                 if (mi == null)
                     continue;
-                //if it follows the rule
                 for (int i = 0; i < totalSuppliers; i++)
                 {
                     //if the email is send by the suppliers
-                    if (mi.SenderEmailAddress.ToLower().Contains(ConfigHelper._configDic["SupplierNames" + (i + 1)].ToLower()))
+                    string companyName = ConfigHelper._configDic["SupplierNames" + (i + 1)].Replace(" ", "").ToLower();
+                    //replace double e with single e
+                    if (companyName.Contains("ee"))
+                        companyName = companyName.Replace("ee", "e");
+                    if (mi.SenderEmailAddress.ToLower().Contains(companyName))
                     {
                         //download all the attachments
                         foreach (var attchment in mi.Attachments)
@@ -87,26 +90,27 @@ namespace Common
                                 string extension = ".xls";
                                 if (attchment.FileName.Contains(".xlsx"))
                                     extension = ".xlsx";
-                                    //set rename
-                                    string rename = ConfigHelper._configDic["SupplierNames"+(i+1)].Replace(" ", "_") + "_" +DateTime.Today.ToString("dd-MM-yyyy");
+                                //set rename
+                                string rename = ConfigHelper._configDic["SupplierNames" + (i + 1)].Replace(" ", "_") + "_";
                                 rename += extension;
                                 attchment.SaveAsFile(savePath + rename);
                                 //save the .xlsx directly
-                                if(extension==".xlsx")
+                                if (extension == ".xlsx")
                                     continue;
                                 //save the .xls file as .xlsx
 
                                 OfficeExcelHelper.SaveAs(savePath, rename);
                                 //delete the original file
-                                if(File.Exists(savePath+ rename))
-                                    File.Delete(savePath+ rename);
+                                if (File.Exists(savePath + rename))
+                                    File.Delete(savePath + rename);
                             }
 
                         }
                     }
-                    //set it read
-                    mi.UnRead = false;
+
                 }
+                //set it read
+                mi.UnRead = false;
 
             }
         }

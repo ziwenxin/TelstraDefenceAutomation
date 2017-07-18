@@ -55,10 +55,6 @@ namespace TelstraDefenceAutomation
                 //delete too old archives
                 FileHelper.DeleteOldArchive(ConfigHelper._configDic["LocalSavePath"] + "\\Archive");
 
-                //before automation, delete all files in the save folder
-
-                FileHelper.DeleteAllFiles(ConfigHelper._configDic["LocalSavePath"]);
-
 
                 //download the supplier documents
                 OutlookHelper.DownloadAttachments();
@@ -84,8 +80,12 @@ namespace TelstraDefenceAutomation
 
 
                 //upload to server
-
                 WinScpHelper.UploadFiles();
+
+
+                //delete all the files in the save folder, if any
+                FileHelper.DeleteAllFiles(ConfigHelper._configDic["LocalSavePath"]);
+
 
                 //run lavastorm program
                 if (ConfigHelper._configDic["EnableAutomation?"].ToLower() == "yes")
@@ -129,13 +129,13 @@ namespace TelstraDefenceAutomation
                     //set content and subject
                     string autoPath = ConfigHelper._configDic["AutomationPath"];
                     string subject = "Automation Rerun Failed";
-                    string content = "Hello," + Environment.NewLine + Environment.NewLine + "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." + Environment.NewLine + Environment.NewLine + "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." +Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" +Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" +autoPath +"' to run TelstraDefenceAutomation.exe manually from its saved location)" +Environment.NewLine +"If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." +Environment.NewLine + Environment.NewLine +"The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" +Environment.NewLine +Environment.NewLine + "Thank you for helping me complete my run," +Environment.NewLine +"The Defence Inventory Data Hub bot";
+                    string content = "Hello," + Environment.NewLine + Environment.NewLine + "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." + Environment.NewLine + Environment.NewLine + "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." + Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" + Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" + autoPath + "' to run TelstraDefenceAutomation.exe manually from its saved location)" + Environment.NewLine + "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." + Environment.NewLine + Environment.NewLine + "The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" + Environment.NewLine + Environment.NewLine + "Thank you for helping me complete my run," + Environment.NewLine + "The Defence Inventory Data Hub bot";
                     OutlookHelper.SendEmail(subject, content);
                     #endregion
                 }
 
 
- 
+
             }
             finally
             {
@@ -176,8 +176,12 @@ namespace TelstraDefenceAutomation
         /// </summary>
         private static void ProcessSalesExcels()
         {
+            //process the two files
             ExcelProcesser.ProcessAvnetExcel();
-           ExcelProcesser.ProcessSucureExcel();
+            ExcelProcesser.ProcessSucureExcel();
+            //make all the file in upper case, which indicates that they are all processed
+            string saleFolder = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory";
+            FileHelper.AddTimeStamps(saleFolder);
         }
 
 
@@ -229,14 +233,19 @@ namespace TelstraDefenceAutomation
         private static void DownLoadSharePointDoc()
         {
             LogHelper.AddToLog("Downloading from share point...");
-            //download file from share point
-            SharePointPage sharePointPage = new SharePointPage();
-            sharePointPage.DownLoadSharePointDoc();
-            //change 1 sheet name from BV & SA to BVSA
             //get path and filename
             string savepath = ConfigHelper._configDic["LocalSavePath"];
             string filename = ConfigHelper._configDic["SharepointFileName"];
             savepath += "\\";
+            //download file from share point, if not exists
+            if (!File.Exists(savepath + filename + ".xlsx"))
+            {
+                SharePointPage sharePointPage = new SharePointPage();
+                sharePointPage.DownLoadSharePointDoc();
+            }
+
+            //change 1 sheet name from BV & SA to BVSA
+
             //set sheet name
             OfficeExcelHelper.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
 
@@ -316,10 +325,10 @@ namespace TelstraDefenceAutomation
             string path = sheet.GetRow(5).GetCell(1).StringCellValue;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
-            if (!Directory.Exists(path+ "\\Archive"))
-                Directory.CreateDirectory(path+ "\\Archive");
-            if (!Directory.Exists(path+ "\\SalesOrderHistory"))
-                Directory.CreateDirectory(path+ "\\SalesOrderHistory");
+            if (!Directory.Exists(path + "\\Archive"))
+                Directory.CreateDirectory(path + "\\Archive");
+            if (!Directory.Exists(path + "\\SalesOrderHistory"))
+                Directory.CreateDirectory(path + "\\SalesOrderHistory");
             //change default download location
             while (true)
             {
@@ -353,35 +362,48 @@ namespace TelstraDefenceAutomation
         {
             LogHelper.AddToLog("DownLoading documents from Toll...");
 
-            //login
             try
             {
+            //login
                 TollLoginPage tollLoginPage = new TollLoginPage();
                 TollReportDownloadPage tollDownloadPage = tollLoginPage.Login();
                 string savepath = ConfigHelper._configDic["LocalSavePath"];
                 savepath += "\\";
                 //download first document
                 string filename = ConfigHelper._configDic["TollDocumentName1"];
-                TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
-                tollGoodReportPage.DownLoadReport(savepath + filename);
+                //download 1st if not exists
+                if (!File.Exists(savepath + filename+" v2.xlsx")&&!File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
+                {
+                    TollGoodReportPage tollGoodReportPage = tollDownloadPage.DownloadGoodDocument();
+                    tollGoodReportPage.DownLoadReport(savepath + filename);
+                //rename the file with v2
+                File.Move(savepath+filename+".xlsx",savepath+filename+" v2.xlsx");
+                    LogHelper.AddToLog(filename + " download completed");
+                }
 
-                LogHelper.AddToLog(filename + " download completed");
                 //download 2nd
                 filename = ConfigHelper._configDic["TollDocumentName2"];
-                tollDownloadPage.GoToReportPage();
-                TollShipOrderPage tollShipDetailPage = tollDownloadPage.DownLoadShipOrder();
-                tollShipDetailPage.DownLoadReport(savepath + filename);
+                //download 2nd if not exists
+                if (!File.Exists(savepath + filename) && !File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
+                {
+                    tollDownloadPage.GoToReportPage();
+                    TollShipOrderPage tollShipDetailPage = tollDownloadPage.DownLoadShipOrder();
+                    tollShipDetailPage.DownLoadReport(savepath + filename);
 
-                LogHelper.AddToLog(filename + " download completed");
+                    LogHelper.AddToLog(filename + " download completed");
+                }
 
                 //download the 3rd 
                 filename = ConfigHelper._configDic["TollDocumentName3"];
-                tollDownloadPage.GoToReportPage();
-                TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
-                tollSohDetailPage.DownLoadReport(savepath + filename);
+                //download if not exists
+                if (!File.Exists(savepath + filename) && !File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
+                {
+                    tollDownloadPage.GoToReportPage();
+                    TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();
+                    tollSohDetailPage.DownLoadReport(savepath + filename);
 
-                LogHelper.AddToLog(filename + " download completed");
-
+                    LogHelper.AddToLog(filename + " download completed");
+                }
             }
             catch (NoReportsException reportsException)
             {
@@ -405,6 +427,11 @@ namespace TelstraDefenceAutomation
             MeridianPortalPage meridianPortalPage = new MeridianPortalPage();
             MeridianNavigationPage meridianNavigationPage = meridianPortalPage.LaunchMeridian();
 
+            //get filename and savepath
+            string savepath = ConfigHelper._configDic["LocalSavePath"];
+            string filename = ConfigHelper._configDic["OriginalFileName1"];
+            savepath += "\\";
+            string rename = ConfigHelper._configDic["Rename1"];
             //download files
             //if it fails, retry it
             int retryCount = 3;
@@ -412,6 +439,8 @@ namespace TelstraDefenceAutomation
             {
                 try
                 {
+                    //download if not exists
+                    if (!File.Exists(savepath+filename+".xls")&& !File.Exists(savepath + rename+".xlsx"))
                     DownLoadPODetailDoc(meridianNavigationPage);
                     break;
                 }
@@ -419,9 +448,7 @@ namespace TelstraDefenceAutomation
                 {
                     LogHelper.AddToLog("Retry Po Detail Download for " + (4 - retryCount) + " times");
                     //if file exists, delete it
-                    string savepath = ConfigHelper._configDic["LocalSavePath"];
-                    string filename = ConfigHelper._configDic["OriginalFileName1"];
-                    savepath += "\\";
+  
                     FileHelper.DeleteFile(savepath, filename);
                     if (retryCount <= 0)
                         throw e;
@@ -432,19 +459,23 @@ namespace TelstraDefenceAutomation
             }
             //retry
             retryCount = 3;
+
+            filename = ConfigHelper._configDic["OriginalFileName2"];
+            rename= ConfigHelper._configDic["Rename2"];
             while (true)
             {
                 try
                 {
-                    DownLoadAccDetailDoc(meridianNavigationPage);
+                    //download if not exists
+                    if (!File.Exists(savepath + filename + ".xls") && !File.Exists(savepath + rename + ".xlsx"))
+                        DownLoadAccDetailDoc(meridianNavigationPage);
                     break;
                 }
                 catch (Exception e)
                 {
                     LogHelper.AddToLog("Retry Account Detail Download for " + (4 - retryCount) + " times");
                     //if file exists, delete it
-                    string savepath = ConfigHelper._configDic["LocalSavePath"];
-                    string filename = ConfigHelper._configDic["OriginalFileName2"];
+
                     if (retryCount <= 0)
                         throw e;
                     retryCount--;
@@ -505,7 +536,7 @@ namespace TelstraDefenceAutomation
         /// <summary>
         /// reschedule the program after 1 min
         /// </summary>
-        public static void RescheduleTask()
+        private static void RescheduleTask()
         {
             //get the service on the local 
             using (TaskService ts = new TaskService())
@@ -548,7 +579,7 @@ namespace TelstraDefenceAutomation
 
 
 
- 
+
         /// <summary>
         /// write all the runtime information to a log file
         /// </summary>
@@ -563,8 +594,10 @@ namespace TelstraDefenceAutomation
             path += "\\" + DateTime.Today.ToString("d").Replace("/", "-");
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+            //define filename
             string filename = path + "\\" + DateTime.Now.ToString().Replace("/", "-").Replace(":", " ") + ".log";
-
+            //write
+            LogHelper.WriteLog(filename);
         }
     }
 }

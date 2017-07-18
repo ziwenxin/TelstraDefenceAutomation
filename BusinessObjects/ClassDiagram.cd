@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="BusinessObjects.MERIDIAN.MeridianAccountDetailPage" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAgAAAAAAAAgACAgAAIAAAAAQAAAAAAAAAAAAAAiAAA=</HashCode>
+      <FileName>MERIDIAN\MeridianAccountDetailPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.MERIDIAN.MeridianCenterPage" Collapsed="true">
+    <Position X="7.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAACQAEAAAAAIAAAAAAAAAAAAAAAAAAAAAAAgAAgAAA=</HashCode>
+      <FileName>MERIDIAN\MeridianCenterPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.MERIDIAN.MeridianDateFilterWindow" Collapsed="true">
+    <Position X="8.5" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAACAIAAAAAAAAAAACAEAAAAACAAAA=</HashCode>
+      <FileName>MERIDIAN\MeridianDateFilterWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.MERIDIAN.MeridianNavigationPage" Collapsed="true">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAIAAABBAAAQAEAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>MERIDIAN\MeridianNavigationPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.MERIDIAN.MeridianPopUpWindow" Collapsed="true">
+    <Position X="5.75" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAEAAAAAAAAAAAAAAAAAAAAAAAAgAAAE=</HashCode>
+      <FileName>MERIDIAN\MeridianPopUpWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.MERIDIAN.MeridianPortalPage" Collapsed="true">
+    <Position X="16.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>MERIDIAN\MeridianPortalPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.MERIDIAN.MeridianVariableEntryPage" Collapsed="true">
+    <Position X="11.5" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAQAAEAAAAAAAAAAAAABAggAQAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>MERIDIAN\MeridianVariableEntryPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.SharePoint.SharePointPage">
+    <Position X="18.25" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAACAAAAAAAAAAAAgAAAAAAAAAAAAAIAAI=</HashCode>
+      <FileName>SharePoint\SharePointPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.Toll.TollGoodReportPage">
+    <Position X="2.5" Y="4.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAYAAAAEAACAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Toll\TollGoodReportPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.Toll.TollLoginPage">
+    <Position X="14" Y="2.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAQBCAACAA=</HashCode>
+      <FileName>Toll\TollLoginPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.Toll.TollReportDownloadPage">
+    <Position X="17.25" Y="2" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAiAAAAiAAAAAAAAAAAAAAACAABABA=</HashCode>
+      <FileName>Toll\TollReportDownloadPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.Toll.TollReportPage">
+    <Position X="5" Y="3.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAKAAAAAIAAAAAAAAAAgAAAAAAAAAAAAI=</HashCode>
+      <FileName>Toll\TollReportPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.Toll.TollShipOrderPage">
+    <Position X="5" Y="4.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAFQACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Toll\TollShipOrderPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BusinessObjects.Toll.TollSOHDetailPage">
+    <Position X="7.5" Y="4.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Toll\TollSOHDetailPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

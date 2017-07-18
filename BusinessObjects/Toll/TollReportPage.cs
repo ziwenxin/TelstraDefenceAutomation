@@ -40,7 +40,7 @@ namespace BusinessObjects.Toll
             AddFilter();
             ViewReportBtn.Click();
 
-            //waut for 5 s
+            //wait for 5 s
             Thread.Sleep(5000);
             //wait until the loading finish
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.Id("ReportViewer1_AsyncWait_Wait")));

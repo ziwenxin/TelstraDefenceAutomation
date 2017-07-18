@@ -10,6 +10,22 @@ namespace Common
     public static class FileHelper
     {
         /// <summary>
+        /// add time stamps to all the files in a directory
+        /// </summary>
+        /// <param name="path"></param>
+        public static void AddTimeStamps(string path)
+        {
+            DirectoryInfo di=new DirectoryInfo(path);
+            foreach (var file in di.GetFiles())
+            {
+                //make each of the file to upper name
+                if (file.Name.Contains(DateTime.Today.ToString("dd-MM-yyyy")))
+                    continue;
+                string upperName =file.DirectoryName+"\\"+ file.Name.Substring(0, file.Name.IndexOf("."))+ DateTime.Today.ToString("dd-MM-yyyy") + file.Extension;
+                File.Move(file.FullName,upperName);
+            }
+        }
+        /// <summary>
         /// this function will delete all the archives older than 3 months
         /// </summary>
         /// <param name="path">save path</param>
