@@ -51,19 +51,14 @@ namespace TelstraDefenceAutomation
                 //get retry times
                 retryTimes = int.Parse(ConfigHelper._configDic["RerunTimes"]);
 
-
                 //delete too old archives
                 FileHelper.DeleteOldArchive(ConfigHelper._configDic["LocalSavePath"] + "\\Archive");
-
-
+                
                 //download the supplier documents
                 OutlookHelper.DownloadAttachments();
 
                 //delete the first row and sheet1 for secure edge and delete 4 rows for avnet
-
                 ProcessSalesExcels();
-
-
 
                 //download excel files
                 DownLoadTollDocuments();
@@ -180,7 +175,7 @@ namespace TelstraDefenceAutomation
             ExcelProcesser.ProcessAvnetExcel();
             ExcelProcesser.ProcessSucureExcel();
             //make all the file in upper case, which indicates that they are all processed
-            string saleFolder = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory";
+            string saleFolder = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
             FileHelper.AddTimeStamps(saleFolder);
         }
 
@@ -242,12 +237,13 @@ namespace TelstraDefenceAutomation
             {
                 SharePointPage sharePointPage = new SharePointPage();
                 sharePointPage.DownLoadSharePointDoc();
+                //change 1 sheet name from BV & SA to BVSA
+
+                //set sheet name
+                OfficeExcelHelper.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
             }
 
-            //change 1 sheet name from BV & SA to BVSA
 
-            //set sheet name
-            OfficeExcelHelper.ChangeSheetName(savepath, filename, "BV & SA", "BVSA");
 
             LogHelper.AddToLog("DownLoad from share point completed");
         }
@@ -322,7 +318,7 @@ namespace TelstraDefenceAutomation
             ISheet sheet = ExcelHelper.ReadExcel("Defense Automation Config.xlsx");
             //check if the download folder exists, if not create one
             StoreIntoDic(sheet);
-            string path = sheet.GetRow(5).GetCell(1).StringCellValue;
+            string path = ConfigHelper._configDic["LocalSavePath"];
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             if (!Directory.Exists(path + "\\Archive"))
@@ -384,7 +380,7 @@ namespace TelstraDefenceAutomation
                 //download 2nd
                 filename = ConfigHelper._configDic["TollDocumentName2"];
                 //download 2nd if not exists
-                if (!File.Exists(savepath + filename) && !File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
+                if (!File.Exists(savepath + filename+".xlsx") && !File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
                 {
                     tollDownloadPage.GoToReportPage();
                     TollShipOrderPage tollShipDetailPage = tollDownloadPage.DownLoadShipOrder();
@@ -396,7 +392,7 @@ namespace TelstraDefenceAutomation
                 //download the 3rd 
                 filename = ConfigHelper._configDic["TollDocumentName3"];
                 //download if not exists
-                if (!File.Exists(savepath + filename) && !File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
+                if (!File.Exists(savepath + filename+ ".xlsx") && !File.Exists(savepath + FileHelper.RemoveV2(filename) + ".xlsx"))
                 {
                     tollDownloadPage.GoToReportPage();
                     TollSOHDetailPage tollSohDetailPage = tollDownloadPage.DownloadSOHDetail();

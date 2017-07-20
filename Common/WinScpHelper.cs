@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,13 +76,17 @@ namespace Common
             RemovalOperationResult removalOperationResult = null;
             //get local path and total suppliers
             string localPath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
-            string remotePath = ConfigHelper._configDic["RemoteSavePath"] + "/SalesOrderHistory/";
+            string remotePath = ConfigHelper._configDic["SupplierRemoteSavePath"] + "/";
             int totalSuppliers = Convert.ToInt32(ConfigHelper._configDic["TotalSuppliers"]);
 
             for (int i = 0; i < totalSuppliers; i++)
             {
                 //check if the updated file exists
-                string supplierFileName = ConfigHelper._configDic["SupplierNames" + (i + 1)].Replace(" ","_");
+                string supplierFileName = ConfigHelper._configDic["SupplierNames" + (i + 1)].Replace(" ","_")+"_";
+                string localFileName = supplierFileName + DateTime.Today.ToString("dd-MM-yyyy")+".xlsx";
+                //if not exists, check next 1
+                if(!File.Exists(localPath+localFileName))
+                    continue;
                 string pattern = supplierFileName + "*.xlsx";
                 //if it needs to be updated
                 foreach (var file in session.EnumerateRemoteFiles(remotePath, pattern, EnumerationOptions.None))
@@ -100,7 +105,7 @@ namespace Common
                 if (operationResult.Transfers.Count >0)
                 {
 
-                    LogHelper.AddToLog(string.Format("Upload of {0} successes", operationResult.Transfers.First().FileName));
+                    LogHelper.AddToLog($"Upload of {operationResult.Transfers.First().FileName} successes");
                 }
 
             }

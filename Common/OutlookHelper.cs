@@ -60,7 +60,7 @@ namespace Common
             var items = inbox.Items.Restrict(restriction);
 
             //read settings
-            string savePath = ConfigHelper._configDic["LocalSavePath"] + "\\" + "SalesOrderHistory\\";
+            string savePath = ConfigHelper._configDic["LocalSavePath"] + "\\SalesOrderHistory\\";
             if (!Directory.Exists(savePath))
                 Directory.CreateDirectory(savePath);
             int totalSuppliers = Convert.ToInt32(ConfigHelper._configDic["TotalSuppliers"]);
@@ -91,7 +91,7 @@ namespace Common
                                 if (attchment.FileName.Contains(".xlsx"))
                                     extension = ".xlsx";
                                 //set rename
-                                string rename = ConfigHelper._configDic["SupplierNames" + (i + 1)].Replace(" ", "_") + "_";
+                                string rename = ConfigHelper._configDic["SupplierNames" + (i + 1)].ToUpper().Replace(" ", "_") + "_";
                                 rename += extension;
                                 attchment.SaveAsFile(savePath + rename);
                                 //save the .xlsx directly

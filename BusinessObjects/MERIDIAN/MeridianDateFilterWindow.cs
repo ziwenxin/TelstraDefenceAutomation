@@ -40,7 +40,7 @@ namespace BusinessObjects.MERIDIAN
         /// <summary>
         /// add date filter, which is 3 month ago to now
         /// </summary>
-        public void AddFilter()
+        public void AddFilter(DateTime startDate)
         {
             //wait for the remove button
             WebDriverWait wait = new WebDriverWait(WebDriver.ChromeDriver, TimeSpan.FromSeconds(30));
@@ -66,7 +66,7 @@ namespace BusinessObjects.MERIDIAN
             //get current date
             string nowStr = DateTime.Today.ToString("d").Replace("/", ".");
             //get the date 3 month ago
-            string threeMonthAgoStr = DateTime.Today.AddMonths(-3).ToString("d").Replace("/", ".");
+            string threeMonthAgoStr = startDate.ToString("d").Replace("/", ".");
             //connect them together, like "01.01.2017 - 01.04.2017";
             string filterStr = threeMonthAgoStr + " - " + nowStr;
             //wait for invoice date field

@@ -118,7 +118,10 @@ namespace BusinessObjects.MERIDIAN
             WaitForLoading();
 
             //add filter
-            MeridianDateFilterWindow meridianAccDetailFilterWindow = AddFilter(); meridianAccDetailFilterWindow.AddFilter();
+            MeridianDateFilterWindow meridanDateFilterWindow = AddFilter();
+            //The date range for Po Detail should be the 1st of the current year to now
+            DateTime startDate = new DateTime(DateTime.Today.Year, 1, 1);
+            meridanDateFilterWindow.AddFilter(startDate);
             //wait for a while
             Thread.Sleep(1000);
             //switch back 
@@ -151,8 +154,11 @@ namespace BusinessObjects.MERIDIAN
             //wait for loading
             WaitForLoading();
 
-            //save the report
-            MeridianDateFilterWindow meridianAccDetailFilterWindow = AddFilter();            meridianAccDetailFilterWindow.AddFilter();
+            //Add filter
+            MeridianDateFilterWindow meridanDateFilterWindow = AddFilter();
+            //the date range for Account Detail should be 3 month ago to current date
+            DateTime startDate = DateTime.Today.AddMonths(-3);
+            meridanDateFilterWindow.AddFilter(startDate);
             //wait for a while
             Thread.Sleep(1000);
             //switch back 

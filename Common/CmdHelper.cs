@@ -104,10 +104,14 @@ namespace Common
                 proc.StandardInput.WriteLine(dosLine);
                 //exit
                 proc.StandardInput.WriteLine("exit");
+                int waitingTime = 0;
                 //wait for exit
                 while (!proc.HasExited)
                 {
                     proc.WaitForExit(1000);
+                    waitingTime += 1000;
+                    if (waitingTime >= 60000)
+                        throw new Exception("Cannot exit the cmd");
                 }
                 //get error messages
                 string errormsg = proc.StandardError.ReadToEnd();
