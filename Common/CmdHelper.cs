@@ -49,6 +49,10 @@ namespace Common
                 Thread.Sleep(5000);
                 //input simulator
                 InputSimulator simulator = new InputSimulator();
+                //maximum the window
+                simulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.MENU,VirtualKeyCode.SPACE);
+                Thread.Sleep(2000);
+                simulator.Keyboard.KeyPress(VirtualKeyCode.VK_X);
                 //move the mouse
                 simulator.Mouse.MoveMouseTo(33000, 30000);
                 Thread.Sleep(1000);
@@ -60,13 +64,16 @@ namespace Common
                 //click rerun
                 Thread.Sleep(1000);
                 //move the mouse
-                simulator.Mouse.MoveMouseTo(24500, 22500);
+                simulator.Mouse.MoveMouseTo(12000, 3500);
                 Thread.Sleep(1000);
                 simulator.Mouse.LeftButtonClick();
 
                 int delaySec = Convert.ToInt32(ConfigHelper._configDic["DelaySeconds"]);
                 //wait for running
-                Thread.Sleep(delaySec*1000);
+                Thread.Sleep(delaySec * 1000);
+                //set focus on the program again
+                ProcessHelper.SetFocusOnProcess("bre");
+                Thread.Sleep(1000);
                 //save the programs
                 simulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_S);
                 Thread.Sleep(3000);

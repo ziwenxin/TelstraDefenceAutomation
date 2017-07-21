@@ -53,7 +53,9 @@ namespace TelstraDefenceAutomation
 
                 //delete too old archives
                 FileHelper.DeleteOldArchive(ConfigHelper._configDic["LocalSavePath"] + "\\Archive");
-                
+
+
+
                 //download the supplier documents
                 OutlookHelper.DownloadAttachments();
 
@@ -111,8 +113,15 @@ namespace TelstraDefenceAutomation
                 if (retryTimes > 0)
                 {
                     //reschedule one run
-                    RescheduleTask();
-                    retryTimes--;
+                    try
+                    {
+                        RescheduleTask();
+                        retryTimes--;
+                    }
+                    catch (Exception exception)
+                    {
+                        LogHelper.AddToLog(exception.Message);
+                    }
                 }
                 //notify admin
                 else
@@ -120,13 +129,37 @@ namespace TelstraDefenceAutomation
 
                     //reset retry times
                     retryTimes = 3;
-                    #region FailureEmail
-                    //set content and subject
-                    string autoPath = ConfigHelper._configDic["AutomationPath"];
-                    string subject = "Automation Rerun Failed";
-                    string content = "Hello," + Environment.NewLine + Environment.NewLine + "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." + Environment.NewLine + Environment.NewLine + "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." + Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" + Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" + autoPath + "' to run TelstraDefenceAutomation.exe manually from its saved location)" + Environment.NewLine + "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." + Environment.NewLine + Environment.NewLine + "The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" + Environment.NewLine + Environment.NewLine + "Thank you for helping me complete my run," + Environment.NewLine + "The Defence Inventory Data Hub bot";
-                    OutlookHelper.SendEmail(subject, content);
-                    #endregion
+                    try
+                    {
+                        #region FailureEmail
+
+                        //set content and subject
+                        string autoPath = ConfigHelper._configDic["AutomationPath"];
+                        string subject = "Automation Rerun Failed";
+                        string content = "Hello," + Environment.NewLine + Environment.NewLine +
+                                         "The bot supporting the Defence Inventory Data Hub has failed to run automatically overnight." +
+                                         Environment.NewLine + Environment.NewLine +
+                                         "Please go to the desktop to run the executable file manually, as the network or a source may not have been available during the automated run." +
+                                         Environment.NewLine + "The executable file is:  TelstraDefenceAutomation.exe" +
+                                         Environment.NewLine + Environment.NewLine + "(Alternatively, you can go to '" +
+                                         autoPath +
+                                         "' to run TelstraDefenceAutomation.exe manually from its saved location)" +
+                                         Environment.NewLine +
+                                         "If the manual run fails, please refer to the handbook for troubleshooting steps by going to Desktop." +
+                                         Environment.NewLine + Environment.NewLine +
+                                         "The user handbook file is: Telstra Defence Automation User Handbook v1.*.*.docx" +
+                                         Environment.NewLine + Environment.NewLine +
+                                         "Thank you for helping me complete my run," + Environment.NewLine +
+                                         "The Defence Inventory Data Hub bot";
+                        OutlookHelper.SendEmail(subject, content);
+
+                        #endregion
+
+                    }
+                    catch (Exception exception)
+                    {
+                        LogHelper.AddToLog(exception.Message);
+                    }
                 }
 
 
