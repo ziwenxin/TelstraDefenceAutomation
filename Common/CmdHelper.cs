@@ -109,6 +109,8 @@ namespace Common
                 proc.Start();
                 string dosLine = @"net use " + path + " /User:" + username + " " + password + " /PERSISTENT:YES";
                 proc.StandardInput.WriteLine(dosLine);
+                //wait for 5 secs for the connection
+                Thread.Sleep(5000);
                 //exit
                 proc.StandardInput.WriteLine("exit");
                 int waitingTime = 0;
